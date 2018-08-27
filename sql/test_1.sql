@@ -1,0 +1,1 @@
+select sydate from dual
