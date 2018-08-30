@@ -48,7 +48,9 @@ def main(reportName):
     dq_New_Bookings = "dans_daily-DQ_New_Orders.sql"
     dq_Awaiting_Shipping = "dans_daiy-DQ_Awaiting_Shipping.sql"
     Future_Orders = "dans_daily-Future_Orders.sql"
+    NonShippable = "dans_daily-OnHand_NonShippable.sql"
 
+    make_dq_files("onhand_nonshippable_locations-1.sql",NonShippable,"")
     make_dq_files("orders-1_Open_Orders.sql", dq_all,"""    and greatest(ola.request_date, nvl((select promise_date
     from
         (
