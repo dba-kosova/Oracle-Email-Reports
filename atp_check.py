@@ -6,7 +6,7 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
-from my_oracle import Oracle
+from my_database import Oracle
 
 
 requests.packages.urllib3.disable_warnings()

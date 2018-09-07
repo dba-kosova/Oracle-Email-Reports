@@ -91,7 +91,7 @@ from (
           ,decode(priority_ms.inventory_item_id,null,2,1) priority_ms
           ,msi.description description
           ,decode(wdj.attribute4,10,1,40,1,30,1,20,2,3) shipment_priority
-          ,to_char(date_released,'MM/DD/YY HH24:MI') released
+          ,trunc(date_released) released
           ,wro.quantity_per_assembly material_quantity
           , (
         select max(msic1.segment1)

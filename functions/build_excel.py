@@ -7,8 +7,10 @@ from os.path import isfile, join
 from os.path import basename
 from settings import ora_con_str
 from settings import msql_con_str
+from my_database import Oracle
 
 def build_workbook(workbook_name):
+
     my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
     my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name.replace(" ","_") + '.xlsx'
     workbook = xlsxwriter.Workbook(my_excel_path)
@@ -16,26 +18,33 @@ def build_workbook(workbook_name):
         print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
         build_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
     workbook.close()
+
     return my_excel_path
 
 def build_workbook_quickship(workbook_name):
+    
     my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
     my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name + '.xlsx'
     workbook = xlsxwriter.Workbook(my_excel_path)
+    
     for i in file_name(my_path, workbook_name):
         print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
         build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
     workbook.close()
+    
     return my_excel_path
 
 def build_print_workbook(workbook_name):
+
     my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
     my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name + '.xlsx'
     workbook = xlsxwriter.Workbook(my_excel_path)
+    
     for i in file_name(my_path, workbook_name):
         print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
         build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
     workbook.close()
+    
     return my_excel_path
 
 def build_worksheet(workbook, sheet, stmt):
@@ -134,9 +143,16 @@ def build_worksheet_from_data(workbook, sheet, header, cur):
 
 def build_print_worksheet(workbook, sheet, stmt):
     
-    con = cx_Oracle.connect('apps_ro','app5_ro','BMCCORE')
-    cur = con.cursor()
-    cur.execute(getFileStmt(stmt))
+    me = Oracle()
+    me.connect()
+    cur = me.cursor.execute(getFileStmt(stmt))
+    
+
+    #con = cx_Oracle.connect('apps_ro','app5_ro','BMCCORE')
+    #cur = con.cursor()
+    #cur.execute(getFileStmt(stmt))
+
+
     headerFormat = workbook.add_format()
     headerFormat.set_bold()
     headerFormat.set_border(2)
@@ -216,8 +232,11 @@ def build_print_worksheet(workbook, sheet, stmt):
             row += 1  
     if row <= 1: sheet.hide()
     sheet.autofilter(0,0,row,len(header)-1)
-    cur.close()
-    con.close()
+    
+    me.close()
+
+    #cur.close()
+    #con.close()
 
 def getFileStmt(fStmt):
     f = open(fStmt,'r')
