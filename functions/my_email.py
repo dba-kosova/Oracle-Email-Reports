@@ -1,12 +1,14 @@
-# email.py
+# my_email.py
 
 """
-    used to create email message
     @author Christopher Pickering
 
+    used to create email message for sending daily reports.
+    will send with attachments or html body
+
 """
 
-import settings
+from my_settings import subscriptions, email_settings
 import time
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -22,13 +24,13 @@ class Email:
 
         # send error emails
         if report.endswith('error'):
-            self.subscriptions = [x.strip() for x in settings.subscriptions['ErrorAddress'].split(',')]
-            self.recipients = settings.subscriptions['ErrorAddress']
+            self.subscriptions = [x.strip() for x in subscriptions['ErrorAddress'].split(',')]
+            self.recipients = subscriptions['ErrorAddress']
             
         # send normal emails
         else:
-            self.subscriptions = [x.strip() for x in settings.subscriptions[report].split(',')]
-            self.recipients = settings.subscriptions[report]
+            self.subscriptions = [x.strip() for x in subscriptions[report].split(',')]
+            self.recipients = subscriptions[report]
         
         
         self.subject = report + " " + time.strftime("%d-%b-%y")
@@ -45,8 +47,8 @@ class Email:
         # email headers
         msg['Subject'] = self.subject
         msg['To'] =  self.recipients
-        msg['From'] = settings.email_settings['default_sender']
-        msg['Reply-To'] = settings.email_settings['reply_to']
+        msg['From'] = email_settings['default_sender']
+        msg['Reply-To'] = email_settings['reply_to']
 
         # email message
         msg.attach(MIMEText(self.htmlmessage, 'html'))
@@ -61,7 +63,7 @@ class Email:
             msg.attach(part)
 
         # send mail
-        server = smtplib.SMTP(settings.email_settings['address'])
+        server = smtplib.SMTP(email_settings['address'])
         server.ehlo()
         server.sendmail(msg['From'], self.subscriptions, msg.as_string())
         server.close()

@@ -8,7 +8,7 @@ import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
 from my_database import Oracle
-from build_excel import build_worksheet_from_data
+from my_workbook import build_worksheet_from_data
 
 requests.packages.urllib3.disable_warnings()
 
@@ -278,6 +278,47 @@ where oha.header_id        = ola.header_id
     htmlTable = """<center><h3>see attachment</h3></center><br>"""
     # send the email    
     Email(reportName, htmlTable).SendMail()
+
+
+
+def build_worksheet_from_data(workbook, sheet, header, cur):
+    
+    headerFormat = workbook.add_format()
+    headerFormat.set_bold()
+    headerFormat.set_align('center')
+    bodyFormat = workbook.add_format()
+    bodyFormat.set_align('left')  
+    dateFormat = workbook.add_format({'num_format': 'd-mmm-yy', 'align':'left'})
+
+    sheet = workbook.add_worksheet(sheet)
+    sheet.freeze_panes(1,0)
+    sheet.set_column(0,len(header),18)
+    
+    i=0
+    col = 0
+    for i in header:
+        sheet.write(0, col, i, headerFormat)
+        col += 1       
+    row = 1
+    col = 0
+    
+    i=0
+    n=0
+    row=1
+    col = 0
+    for i in cur:
+        #print(row)
+        for n in range(len(header)):
+            #print(n)
+            try:
+                sheet.write_number(row, col + n , float(i[n]), bodyFormat)
+            except:
+                try:
+                    sheet.write_datetime(row, col + n , i[n], dateFormat)
+                except:
+                    sheet.write_string(row, col + n , str(i[n]), bodyFormat)
+        row += 1  
+    
 
 try:
 

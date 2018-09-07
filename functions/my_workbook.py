@@ -1,62 +1,83 @@
-import cx_Oracle
-import pyodbc
+# my_workbook.py
+
+"""
+    @author Christopher Pickering
+
+    functions used to create formated excel files
+
+"""
+
 import xlsxwriter
-import os, fnmatch
+import os
+import fnmatch
 from os import listdir
 from os.path import isfile, join
 from os.path import basename
-from settings import ora_con_str
-from settings import msql_con_str
-from my_database import Oracle
+from my_database import Database
+
+class Workbook:
+    def __init__(self,workbook_name):
+        
+        # define paths
+        self.my_sql_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql'))
+        self.my_excel_path =os.path.join(self.my_sql_path.replace('sql','excel'),workbook_name.replace(" ","_") + '.xlsx')
+
+        # define workbook
+        self.workbook_name = workbook_name.lower()
+        self.workbook = xlsxwriter.Workbook(self.my_excel_path)
+        self.workbook_tab_list = self.tab_list()
+
+    def tab_list(self):
+        result = []
+        for root, dirs, files in os.walk(self.my_sql_path):
+            for file in sorted(files, key=str.lower):
+                if fnmatch.fnmatch(file, self.workbook_name + '-*.sql') == True:
+                    result.append(os.path.join(root, file))
+        return result
+
+    def worksheet(self):
+        
+
+        return None        
+
+
+    def print_worksheet(self):
+        return None
+
+    def close_workbook(self):
+        self.workbook.close()
+
 
 def build_workbook(workbook_name):
 
-    my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
-    my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name.replace(" ","_") + '.xlsx'
+    my_sql_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql'))
+    my_excel_path =os.path.join(my_sql_path.replace('sql','excel'),workbook_name.replace(" ","_") + '.xlsx')
+    
     workbook = xlsxwriter.Workbook(my_excel_path)
-    for i in file_name(my_path, workbook_name.replace(" ","_")):
-        print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
-        build_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
+    
+    for i in file_name(my_sql_path, workbook_name.replace(" ","_")):
+        if workbook_name == 'Quickship':
+            build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
+
+        else:
+            build_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
+
     workbook.close()
 
     return my_excel_path
 
-def build_workbook_quickship(workbook_name):
-    
-    my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
-    my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name + '.xlsx'
-    workbook = xlsxwriter.Workbook(my_excel_path)
-    
-    for i in file_name(my_path, workbook_name):
-        print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
-        build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
-    workbook.close()
-    
-    return my_excel_path
-
-def build_print_workbook(workbook_name):
-
-    my_path = os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql')
-    my_excel_path =my_path.replace('sql','excel') + "\\"+ workbook_name + '.xlsx'
-    workbook = xlsxwriter.Workbook(my_excel_path)
-    
-    for i in file_name(my_path, workbook_name):
-        print(basename(i).split(".")[0].split("-")[-1].replace("_"," ") )
-        build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
-    workbook.close()
-    
-    return my_excel_path
 
 def build_worksheet(workbook, sheet, stmt):
     
-    try:
-        con = cx_Oracle.connect(ora_con_str['UserName'],ora_con_str['Password'],ora_con_str['TNS'])
-        cur = con.cursor()
-        cur.execute(getFileStmt(stmt))
+    me = Database()
+    
+    try:       
+        me.oracle_connect()
+        cur = me.run_stmt(stmt)
+
     except:
-        con = pyodbc.connect('DSN='+msql_con_str['TNS']+';UID='+msql_con_str['UserName']+';PWD='+msql_con_str['Password'])
-        cur = con.cursor()
-        cur.execute(getFileStmt(stmt))
+        me.mssql_connect()
+        cur = me.run_stmt(stmt)
 
 
     headerFormat = workbook.add_format()
@@ -83,9 +104,7 @@ def build_worksheet(workbook, sheet, stmt):
     row=1
     col = 0
     for i in cur:
-        #print(row)
         for n in range(len(header)):
-            #print(n)
             try:
                 sheet.write_number(row, col + n , float(i[n]), bodyFormat)
             except:
@@ -96,63 +115,16 @@ def build_worksheet(workbook, sheet, stmt):
         row += 1  
     if row <= 1: sheet.hide()
 
+    me.close()
 
-    cur.close()
-    con.close()
 
-def build_worksheet_from_data(workbook, sheet, header, cur):
-    
-    headerFormat = workbook.add_format()
-    headerFormat.set_bold()
-    headerFormat.set_align('center')
-    bodyFormat = workbook.add_format()
-    bodyFormat.set_align('left')  
-    dateFormat = workbook.add_format({'num_format': 'd-mmm-yy', 'align':'left'})
-
-    sheet = workbook.add_worksheet(sheet)
-    sheet.freeze_panes(1,0)
-    sheet.set_column(0,len(header),18)
-    
-    i=0
-    col = 0
-    for i in header:
-        sheet.write(0, col, i, headerFormat)
-        col += 1       
-    row = 1
-    col = 0
-    
-    i=0
-    n=0
-    row=1
-    col = 0
-    for i in cur:
-        #print(row)
-        for n in range(len(header)):
-            #print(n)
-            try:
-                sheet.write_number(row, col + n , float(i[n]), bodyFormat)
-            except:
-                try:
-                    sheet.write_datetime(row, col + n , i[n], dateFormat)
-                except:
-                    sheet.write_string(row, col + n , str(i[n]), bodyFormat)
-        row += 1  
-    
-
-   
 
 def build_print_worksheet(workbook, sheet, stmt):
     
-    me = Oracle()
-    me.connect()
-    cur = me.cursor.execute(getFileStmt(stmt))
+    me = Database()
+    me.oracle_connect()
+    cur = me.run_stmt(stmt)
     
-
-    #con = cx_Oracle.connect('apps_ro','app5_ro','BMCCORE')
-    #cur = con.cursor()
-    #cur.execute(getFileStmt(stmt))
-
-
     headerFormat = workbook.add_format()
     headerFormat.set_bold()
     headerFormat.set_border(2)
@@ -189,8 +161,6 @@ def build_print_worksheet(workbook, sheet, stmt):
     sheet.set_column(7,len(header),10)
     sheet.fit_to_pages(1, 0) 
     sheet.set_landscape()
-    #sheet.set_margins([left=0.2,] [right=0.2, top=0.75, bottom=0.75])
-    #sheet.set_column(0,len(header),18)
     
     i=0
     col = 0
@@ -219,9 +189,7 @@ def build_print_worksheet(workbook, sheet, stmt):
         
         else:
 
-        #print(row)
             for n in range(len(header)):
-                #print(n)
                 try:
                     sheet.write_number(row, col + n , float(i[n]), bodyFormat)
                 except:
@@ -235,21 +203,10 @@ def build_print_worksheet(workbook, sheet, stmt):
     
     me.close()
 
-    #cur.close()
-    #con.close()
-
-def getFileStmt(fStmt):
-    f = open(fStmt,'r')
-    stmt = f.read()
-    f.close()
-    return stmt
-
 def file_name(path, name):
     result = []
-    pattern = name + '-*.sql'
     for root, dirs, files in os.walk(path):
-        #print(sorted(files))
         for name in sorted(files, key=str.lower):
-            if fnmatch.fnmatch(name, pattern) == True:
+            if fnmatch.fnmatch(name, name + '-*.sql') == True:
                 result.append(os.path.join(root, name))
     return result

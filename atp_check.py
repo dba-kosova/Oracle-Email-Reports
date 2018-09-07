@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import json
 from lxml import html
@@ -6,10 +8,10 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
-from my_database import Oracle
-
+from my_database import Database
 
 requests.packages.urllib3.disable_warnings()
+
 global reportName
 reportName = "ATP Check"
 
@@ -107,8 +109,8 @@ def main(reportName):
 def get_work_days(atp_date):
     sql = "select apps.xxbim_get_working_days(85, sysdate, to_date('" + str(atp_date) + "' ,'YYYY-MM-DD')) from dual"
     
-    me = Oracle()
-    me.connect()
+    me = Database()
+    me.oracle_connect()
     a = me.cursor.execute(sql).fetchone()
     me.close()
 
@@ -156,8 +158,8 @@ and msi.organization_id = cat.organization_id(+)
 
 """
 
-    me = Oracle()
-    me.connect()
+    me = Database()
+    me.oracle_connect()
     results = me.cursor.execute(sql).fetchall()
     me.close()
 

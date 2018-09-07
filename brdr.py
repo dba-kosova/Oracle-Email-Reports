@@ -4,8 +4,8 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
-from settings import ora_con_str
-from build_excel import build_workbook
+from my_settings import ora_con_str
+from my_workbook import build_workbook
 
 global reportName 
 reportName = "BRDR"
