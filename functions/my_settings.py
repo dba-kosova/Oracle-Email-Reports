@@ -26,6 +26,7 @@ msql_con_str = {
 }
 
 subscriptions = {
+	"Dans_Daily":"christopher.pickering@imi-precision.com",
 	"ASCP":"wangj@bimba.com,naoomp@bimba.com,mcauliffem@bimba.com,SowatzkeK@bimba.com,haysg@bimba.com,makenasl@bimba.com,pottsm@bimba.com,dan.diaz@imi-precision.com",
 	"ATP Check":"pottsm@bimba.com,pickeringc@bimba.com",
 	"ATP Check - Move Ins":"pickeringc@bimba.com,pottsm@bimba.com,makenasl@bimba.com,lanzendorfl@bimba.com,kristin.smith@imi-precision.com",
@@ -59,9 +60,7 @@ subscriptions = {
 	"PPG":"pickeringc@bimba.com,frank.salazar@imi-precision.com",
 	"Production_Planning":"pickeringc@bimba.com,patinoy@bimba.com,Jasibe.alarid@imi-precision.com",
 	"Putaway":"haynesk@bimba.com,pickeringc@bimba.com,frank.salazar@imi-precision.com",
-	"Quickship":"""pickeringc@bimba.com,
-					christopher.pickering@imi-precision.com""",
-	"aQuickship":"""roggemanns@bimba.com,greenquiste@bimba.com,pottsm@bimba.com,makenasl@bimba.com,maziurm@bimba.com,fryet@bimba.com,fanellom@bimba.com,
+	"Quickship":"""roggemanns@bimba.com,greenquiste@bimba.com,pottsm@bimba.com,makenasl@bimba.com,maziurm@bimba.com,fryet@bimba.com,fanellom@bimba.com,
 					haynesk@bimba.com,LewisM@bimba.com,luehrsj@bimba.com,murphyj@bimba.com,garciac@bimba.com,schippitsk@bimba.com,smitha@bimba.com,
 					pickeringc@bimba.com,ramirezm@bimba.com,gallegosm@bimba.com,mathisb@bimba.com,frank.salazar@imi-precision.com""",
 	"QuickshipPM":"mario.ramirez@imi-precision.com",

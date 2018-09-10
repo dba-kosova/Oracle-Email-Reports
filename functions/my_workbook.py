@@ -51,15 +51,16 @@ class Workbook:
 def build_workbook(workbook_name):
 
     my_sql_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql'))
-    my_excel_path =os.path.join(my_sql_path.replace('sql','excel'),workbook_name.replace(" ","_") + '.xlsx')
-    
+    my_excel_path =os.path.abspath(os.path.join(my_sql_path.replace('sql','excel'),workbook_name.replace(" ","_") + '.xlsx'))
+
     workbook = xlsxwriter.Workbook(my_excel_path)
-    
+    print (file_name(my_sql_path, workbook_name.replace(" ","_")))
     for i in file_name(my_sql_path, workbook_name.replace(" ","_")):
         if workbook_name == 'Quickship':
             build_print_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
 
         else:
+
             build_worksheet(workbook, basename(i).split(".")[0].split("-")[-1].replace("_"," ")  , i)
 
     workbook.close()
@@ -71,13 +72,15 @@ def build_worksheet(workbook, sheet, stmt):
     
     me = Database()
     
-    try:       
-        me.oracle_connect()
-        cur = me.run_stmt(stmt)
+    #try:       
+    print(stmt)
+    me.oracle_connect()
+    cur = me.run_url(stmt)
 
-    except:
-        me.mssql_connect()
-        cur = me.run_stmt(stmt)
+
+    #except:
+    #    me.mssql_connect()
+     #   cur = me.run_url(stmt)
 
 
     headerFormat = workbook.add_format()
@@ -123,7 +126,7 @@ def build_print_worksheet(workbook, sheet, stmt):
     
     me = Database()
     me.oracle_connect()
-    cur = me.run_stmt(stmt)
+    cur = me.run_url(stmt)
     
     headerFormat = workbook.add_format()
     headerFormat.set_bold()
@@ -206,7 +209,8 @@ def build_print_worksheet(workbook, sheet, stmt):
 def file_name(path, name):
     result = []
     for root, dirs, files in os.walk(path):
-        for name in sorted(files, key=str.lower):
-            if fnmatch.fnmatch(name, name + '-*.sql') == True:
-                result.append(os.path.join(root, name))
+
+        for file in sorted(files, key=str.lower):
+            if fnmatch.fnmatch(file, name + '-*.sql') == True:
+                result.append(os.path.join(root, file))
     return result
