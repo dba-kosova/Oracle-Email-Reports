@@ -1,3 +1,14 @@
+# atp_move_ins.py
+
+"""
+    @author: Christopher Pickering
+    
+    This report will check the apt on any item that was booked with longer than standard lead time.
+    If the lead time has improved by x days since the initial lead time calc the item will be added to a 
+    report and emailed to interested parties.
+
+"""
+
 import requests
 import json
 from lxml import html
@@ -7,12 +18,9 @@ import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
-from my_database import Oracle
-from my_workbook import build_worksheet_from_data
+from my_database import Database
 
 requests.packages.urllib3.disable_warnings()
-
-reportName = "ATP Check - Move Ins"
 
 def get_current_atp(item,quantity):
     
@@ -108,8 +116,8 @@ def get_test_info(header_id, line_id):
                 and ola.line_id   = """ + str(int(line_id)) + """
 """
 
-    me = Oracle()
-    me.connect()
+    me = Database()
+    me.oracle_connect()
 
     cur = me.cursor.execute(sql)
 
@@ -123,7 +131,7 @@ def get_test_info(header_id, line_id):
 
 
 
-def main():
+def main(reportName):
     workbook_name="atp_move_ins"
     my_path = os.path.join(os.path.dirname( __file__ ),'excel')
     my_excel_path =my_path + "\\"+ workbook_name.replace(" ","_") + '.xlsx'
@@ -189,8 +197,8 @@ where oha.header_id        = ola.header_id
 """
     print("getting oracle data")
 
-    me = Oracle()
-    me.connect()
+    me = Database()
+    me.oracle_connect()
 
     cur = me.cursor.execute(sql)
 
@@ -319,10 +327,11 @@ def build_worksheet_from_data(workbook, sheet, header, cur):
                     sheet.write_string(row, col + n , str(i[n]), bodyFormat)
         row += 1  
     
+reportName = "ATP Check - Move Ins"
 
 try:
+    main(reportName)
 
-    main()
 except BaseException as e:
     print(str(e))
     Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()

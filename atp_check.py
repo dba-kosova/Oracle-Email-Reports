@@ -1,4 +1,13 @@
 # -*- coding: utf-8 -*-
+# atp_check.py
+
+"""
+    @author: Christopher Pickering
+    
+    This report will grab the top x selling p/n's and run them through bimba.com's atp check.
+    Any abnormal leadtimes will be reports to interested parties.
+
+"""
 
 import requests
 import json
@@ -12,9 +21,6 @@ from my_database import Database
 
 requests.packages.urllib3.disable_warnings()
 
-global reportName
-reportName = "ATP Check"
-
 def get_current_atp(item,quantity):
 
     data = json.loads(requests.get('http://www.bimba.com/configurator/index.php?pn=' + item + '&qty=' + quantity).text)
@@ -27,13 +33,11 @@ def get_current_atp(item,quantity):
 def main(reportName):
     print("getting top sellers")
     top_sellers = get_top_sellers()
-
    
     array = "No ATP Errors Today"
 
     # loop through top sellers and check atp for a qty of 2
-    for a,i in enumerate(top_sellers):
-       
+    for a,i in enumerate(top_sellers):      
         date = get_current_atp(i[0],'2')
 
         # if a date is given there should be success here
@@ -50,9 +54,7 @@ def main(reportName):
 
         # if work days was calculated
         if isinstance( work_days, int ):
-            print(i[0])
-            print(work_days)
-            
+                        
             # if the ATP was not a good number
             if work_days > 13:
 
@@ -66,9 +68,9 @@ def main(reportName):
                                                             .tg .tg-yw4l{vertical-align:top}
                                                             th.tg-sort-header::-moz-selection { background:transparent; }th.tg-sort-header::selection      { background:transparent; }th.tg-sort-header { cursor:pointer; }table th.tg-sort-header:after {  content:'';  float:right;  margin-top:7px;  border-width:0 4px 4px;  border-style:solid;  border-color:#404040 transparent;  visibility:hidden;  }table th.tg-sort-header:hover:after {  visibility:visible;  }table th.tg-sort-desc:after,table th.tg-sort-asc:after,table th.tg-sort-asc:hover:after {  visibility:visible;  opacity:0.4;  }table th.tg-sort-desc:after {  border-bottom:none;  border-width:4px 4px 0;  }@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
                                                             <div class="tg-wrap"><table id="tg-HdWXw" class="tg"><tr>
-                                                                        <th class="tg-baqh">Item</th>
-                                                                        <th class="tg-baqh">Lead Time<br></th>
-                                                                      </tr>"""
+                                                            <th class="tg-baqh">Item</th>
+                                                            <th class="tg-baqh">Lead Time<br></th>
+                                                          </tr>"""
                 
                 # add heading to array
                 array += """<tr>
@@ -88,9 +90,9 @@ def main(reportName):
                                                             .tg .tg-yw4l{vertical-align:top}
                                                             th.tg-sort-header::-moz-selection { background:transparent; }th.tg-sort-header::selection      { background:transparent; }th.tg-sort-header { cursor:pointer; }table th.tg-sort-header:after {  content:'';  float:right;  margin-top:7px;  border-width:0 4px 4px;  border-style:solid;  border-color:#404040 transparent;  visibility:hidden;  }table th.tg-sort-header:hover:after {  visibility:visible;  }table th.tg-sort-desc:after,table th.tg-sort-asc:after,table th.tg-sort-asc:hover:after {  visibility:visible;  opacity:0.4;  }table th.tg-sort-desc:after {  border-bottom:none;  border-width:4px 4px 0;  }@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
                                                             <div class="tg-wrap"><table id="tg-HdWXw" class="tg"><tr>
-                                                                        <th class="tg-baqh">Item</th>
-                                                                        <th class="tg-baqh">Lead Time<br></th>
-                                                                      </tr>"""
+                                                            <th class="tg-baqh">Item</th>
+                                                            <th class="tg-baqh">Lead Time<br></th>
+                                                          </tr>"""
             array += """<tr>
                         <td class="tg-j2zy">"""+str(i[0])+"""</td>
                         <td class="tg-j2zy">"""+ str(work_days) + """</td>
@@ -108,13 +110,13 @@ def main(reportName):
 
 def get_work_days(atp_date):
     sql = "select apps.xxbim_get_working_days(85, sysdate, to_date('" + str(atp_date) + "' ,'YYYY-MM-DD')) from dual"
-    
+
     me = Database()
     me.oracle_connect()
-    a = me.cursor.execute(sql).fetchone()
+    a = me.cursor.execute(sql).fetchone()[0]
     me.close()
 
-    return a[0]
+    return a
 
 def get_top_sellers():
 
@@ -164,6 +166,8 @@ and msi.organization_id = cat.organization_id(+)
     me.close()
 
     return results
+
+reportName = "ATP Check"
 
 try:
     main(reportName)

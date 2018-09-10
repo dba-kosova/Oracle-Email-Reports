@@ -1,36 +1,47 @@
-import time
+# Dans_Daily.py
+
+"""
+    @author: Christopher Pickering
+    
+    The intent of this report is to merge several reports and datasets into one report
+    for boss man, without rewriting, creating dups, or changing other reports.
+
+"""
+
 import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
-from my_workbook import build_workbook
+from my_workbook import Workbook
 from shutil import copyfile
 import os
 
 def make_dq_files(source, filename, sql):
 
-    home_path = os.path.join(os.path.dirname( __file__ ),'sql\\')
-    print(home_path)
-    copyfile(home_path + source, home_path + filename)
+    home_path = os.path.join(os.path.dirname( __file__ ),'sql')
+    new_file = os.path.join(home_path, filename)
+    old_file = os.path.join(home_path, source)
+    copyfile(old_file, new_file)
     
-    f = open(home_path + filename,"r")
+    # get contents of sql file
+    f = open(new_file,"r")
     contents = f.readlines()
     f.close()
 
+    # add new stuff to the end of it
     contents.insert(sum(1 for line in contents)-1,sql + "\n")
 
     contents = "".join(contents)
 
-    f = open(home_path + filename, "w")
+    # send stuff back to file
+    f = open(new_file, "w")
     f.write(contents)
     f.close()
 
 def delete_dq_files(filename):
-    if os.path.exists(home_path + filename):
-        os.remove(home_path + filename)
+    if os.path.exists(os.path.join(home_path, filename)):
+        os.remove(os.path.join(home_path, filename))
 
-global reportName
-reportName = "Dans_Daily"
 def main(reportName):
 
     dq_all = "dans_daily-DQ_All.sql"
@@ -113,11 +124,17 @@ def main(reportName):
 
     make_dq_files("orders-1_Open_Orders.sql",Future_Orders,"""  and ola.request_date > apps.xxbim_get_calendar_date('BIM', sysdate, 30)""")
 
-    my_path = build_workbook(reportName)
-    htmlTable = """<center><h3>see attachment</h3></center><br>"""
+    #initialize workbook
+    my_workbook = Workbook(reportName)
+
+    # create worksheets
+    my_path = my_workbook.build_workbook()
+
+    htmlTable = None
 
     Email(reportName, htmlTable).SendMail()
 
+reportName = os.path.basename(__file__ ).split('.')[0]
 
 try:
     main(reportName)

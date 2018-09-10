@@ -13,13 +13,17 @@
 import sys
 import os.path
 sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_workbook import build_workbook
+from my_workbook import Workbook
 from my_email import Email
 
 def main(reportName):
+   
+    # create worksheets
+    me = Workbook(reportName)
+    my_path = me.build_workbook()
 
-    my_path = build_workbook(reportName)
-    htmlTable = """<center><h3>see attachment</h3></center><br>"""
+    # send emails
+    htmlTable = None
     Email(reportName, htmlTable).SendMail()
 
 if __name__ == '__main__': 
