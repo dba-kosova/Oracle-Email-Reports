@@ -26,7 +26,6 @@ msql_con_str = {
 }
 
 subscriptions = {
-	"orders":"christopher.pickering@imi-precision.com",
 	"ascp":"wangj@bimba.com,naoomp@bimba.com,mcauliffem@bimba.com,SowatzkeK@bimba.com,haysg@bimba.com,makenasl@bimba.com,pottsm@bimba.com,dan.diaz@imi-precision.com",
 	"atp check":"pottsm@bimba.com,pickeringc@bimba.com",
 	"atp check - move ins":"pickeringc@bimba.com,pottsm@bimba.com,makenasl@bimba.com,lanzendorfl@bimba.com,kristin.smith@imi-precision.com",
@@ -49,7 +48,7 @@ subscriptions = {
 					klinea@bimba.com,nemethd@bimba.com,mathisb@bimba.com,Shaultsb@bimba.com,LewisM@bimba.com,goldenc@bimba.com,dan.diaz@imi-precision.com""",
 	"onhand nonshippable locations":"haynesk@bimba.com,pickeringc@bimba.com,welchd@bimba.com,frank.salazar@imi-precision.com,jeff.buzzo@imi-precision.com",
 	"on hold":"pickeringc@bimba.com,roggemanns@bimba.com,garciac@bimba.com",
-	"aorders":"""pickeringc@bimba.com,meldeaus@bimba.com,lanzendorfl@bimba.com,haysg@bimba.com,nittim@bimba.com,doranr@bimba.com,makenasl@bimba.com,
+	"orders":"""pickeringc@bimba.com,meldeaus@bimba.com,lanzendorfl@bimba.com,haysg@bimba.com,nittim@bimba.com,doranr@bimba.com,makenasl@bimba.com,
 					roggemanns@bimba.com,pottsm@bimba.com,fanellom@bimba.com,smitha@bimba.com,schippitsk@bimba.com,sowatzkek@bimba.com,wehlingj@bimba.com,
 					maziurm@bimba.com,raij@bimba.com,greenquiste@bimba.com,douglask@bimba.com,carlsonn@bimba.com,norderp@bimba.com,pavlickm@bimba.com,
 					manuels@bimba.com,gallegosm@bimba.com,tervow@bimba.com,schranka@bimba.com,ramirezm@bimba.com,cornejor@bimba.com,evansj@bimba.com,
