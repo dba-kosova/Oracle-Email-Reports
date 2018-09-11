@@ -6,5 +6,4 @@ sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
 from my_email import Email
 from my_workbook import Workbook
 
-
 Email('test', None).SendMail()
