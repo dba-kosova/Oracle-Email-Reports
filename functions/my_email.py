@@ -15,7 +15,7 @@ import calendar
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
-from email.MIMEImage import MIMEImage
+from email.mime.image import MIMEImage
 from email import encoders
 import smtplib
 import os.path
@@ -67,10 +67,12 @@ class Email:
 
         # add logo signature
         # for this to work the img src must be "cid:<image1>"
-        msgImage = MIMEImage(open(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'logo.png'))).read())
+        fp = open(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'logo.png')),'rb')
+        msgImage = MIMEImage(fp.read())
         msgImage.add_header('Content-ID', '<image1>')
         msg.attach(msgImage)
-        
+        fp.close()
+
         # send mail
         server = smtplib.SMTP(email_settings['address'])
         server.ehlo()
