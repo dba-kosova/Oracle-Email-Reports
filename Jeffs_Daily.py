@@ -43,7 +43,7 @@ def delete_dq_files(filename):
 
 def main(reportName): 
 
-    make_sql_files("orders-1_Open_Orders.sql", "Jeffs_Daily-orders","""and wdj.status_type_disp = 'Released'
+    make_sql_files("orders-1_Open_Orders.sql", "Jeffs_Daily-orders.sql","""and wdj.status_type_disp = 'Released'
     and ola.ship_from_org_id = 85
     and nvl((select promise_date
 from
