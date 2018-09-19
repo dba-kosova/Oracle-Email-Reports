@@ -31,6 +31,7 @@ def make_sql_files(source, filename, sql):
     contents.insert(sum(1 for line in contents)-1,sql + "\n")
 
     contents = "".join(contents)
+    print contents
 
     # send stuff back to file
     f = open(new_file, "w")
@@ -59,6 +60,9 @@ from
     )
 where rownum   = 1
     and line_id   = ola.line_id),promise_date) <= apps.xxbim_get_calendar_date('BIM', sysdate,5)""")
+
+    make_sql_files("transactions-Yesterday.sql", "Jeffs_Daily-WIP_Completion.sql","""    and transaction_type_id = 44
+""")
 
   
     #initialize workbook

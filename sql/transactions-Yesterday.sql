@@ -52,7 +52,14 @@ select
 			and disposition_id   = transaction_source_id
 	)
 	"Account"
+    ,transaction_type_id
+    ,(select wdj.wip_entity_name from wip_discrete_jobs_v wdj where organization_id = mmt.organization_id and wip_entity_id = mmt.transaction_source_id) "Job"
+    ,(select wdj.project_name from wip_discrete_jobs_v wdj where organization_id = mmt.organization_id and wip_entity_Id = mmt.transaction_source_id) "Project"
+    ,(select wdj.line_code from wip_discrete_jobs_v wdj where organization_id = mmt.organization_id and wip_entity_Id = mmt.transaction_source_id) "Project"
+
 from mtl_material_transactions mmt
+
 where mmt.organization_id     = 85
 	and transaction_date  between apps.xxbim_get_calendar_date('BIM', sysdate, -1) and trunc(sysdate)
-	
+    --and transaction_type_id = 44
+    order by 3
