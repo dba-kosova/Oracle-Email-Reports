@@ -221,5 +221,5 @@ from
         order by hist_creation_date asc
     )
 where rownum   = 1
-    and line_id   = ola.line_id),promise_date) < apps.xxbim_get_calendar_date('BIM', sysdate,1)
+    and line_id   = ola.line_id),promise_date) <= apps.xxbim_get_calendar_date('BIM', sysdate,5)
 order by trunc(schedule_ship_date) asc
