@@ -13,6 +13,7 @@
     # option 1. connect to oracle database
     me.oracle_connect()
     # option 2. connect to microsoft database
+    me.mssql_connect()
     
     # option 1. run sql in script
     me.cursor.execute()
@@ -37,10 +38,6 @@ class Database:
         self.connection = None
         self.cursor = None
         self.sql = None
-
-    def connect(self):
-        self.connection = cx_Oracle.connect(ora_con_str['UserName'],ora_con_str['Password'],ora_con_str['TNS'])
-        self.cursor = self.connection.cursor()
 
     # for Oracle SQL database
     def oracle_connect(self):
