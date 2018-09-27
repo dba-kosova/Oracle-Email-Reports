@@ -206,7 +206,6 @@ and ola.ship_to_org_id = b.site_use_id -- or a.invoice_to_org_id
     and ola.source_type_code <> 'EXTERNAL'
     and ola.line_type_id not in (1073,1077,1127) -- return, sample, vendor order
     
-
 and wdj.status_type_disp = 'Released'
     and ola.ship_from_org_id = 85
     and nvl((select promise_date
@@ -223,5 +222,4 @@ from
     )
 where rownum   = 1
     and line_id   = ola.line_id),promise_date) <= apps.xxbim_get_calendar_date('BIM', sysdate,5)
-
 order by trunc(schedule_ship_date) asc
