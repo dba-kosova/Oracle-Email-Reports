@@ -31,7 +31,6 @@ def make_sql_files(source, filename, sql):
     contents.insert(sum(1 for line in contents)-1,sql + "\n")
 
     contents = "".join(contents)
-    print contents
 
     # send stuff back to file
     f = open(new_file, "w")
