@@ -25,6 +25,7 @@ from
 			)
 			, 1, 'Router', 'No Router') router
 		, where_used.parent_item
+        , where_used.inventory_item_status_code "Parent Status Code"
 		, where_used.parent_creation_date
 		from mtl_system_items_b msi
 		, cst_item_costs frz_cost
@@ -35,6 +36,7 @@ from
 				, bom.organization_id
 				, comp.component_item_id
 				, p.creation_date parent_creation_date
+                , inventory_item_status_code
 				from mtl_system_items_b p
 				, bom_structures_b bom
 				, bom_components_b comp
