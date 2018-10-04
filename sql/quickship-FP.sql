@@ -35,6 +35,7 @@ where oeh.header_id              = oel.header_id
 , status_type_disp			"Status"
 , date_released			"Date Released"
 , date_completed			"Date Completed"
+, schedule_group_name "Bore Size"
 from wip_discrete_jobs_v wdj			
 , mtl_system_items_b msi			
 where 1                  =1			
@@ -96,7 +97,7 @@ where oeh.header_id              = oel.header_id
 , ola.ordered_item
 , to_number(ola.ordered_quantity - nvl(shipped_QUANTITY,0))
 , oe_line_status_pub.get_line_status(ola.line_id, ola.flow_status_code) line_status_func
-, to_date(null) col7, to_date(null) col8
+, to_date(null) col7, to_date(null) col8, null col9
 from oe_order_lines_all ola
 , oe_order_headers_all oha
 where 1                                                                         =1
