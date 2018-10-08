@@ -1,7 +1,8 @@
 SELECT
     a.segment1,
     c.subinventory_code,
-    c.on_hand_qty
+    c.on_hand_qty,
+    date_received
 FROM
     mtl_system_items_b a,
     apps.mtl_item_locations_kfv b,
@@ -10,7 +11,8 @@ FROM
             moqd.inventory_item_id,
             moqd.organization_id,
             moqd.subinventory_code,
-            moqd.locator_id,
+            max(date_received) date_received
+            ,moqd.locator_id,
             SUM(primary_transaction_quantity) on_hand_qty
         FROM
             mtl_onhand_quantities_detail moqd
@@ -27,3 +29,4 @@ WHERE
     AND   c.organization_id = b.organization_id (+)
     AND   c.locator_id = b.inventory_location_id (+)
     AND   c.subinventory_code = 'BD FINAL'
+    order by date_received asc
