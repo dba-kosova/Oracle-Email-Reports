@@ -1,7 +1,8 @@
 select decode(o.ship_from_org_id, 85, 'BIM', 90, 'BMX') "Ship From"
 , h.order_number
-	|| '-'
-	|| o.line_number "Order Number"
+    || '-'
+    || o.line_number "Order Number"
+    , h.CUST_PO_NUMBER "Req"
 , wdj.project_number "Project"
 , wdj.wip_entity_id "Job"
 , ordered_item "Item"
@@ -26,10 +27,10 @@ where o.open_flag       = 'Y'
 and o.booked_flag = 'Y'
 and o.cancelled_flag = 'N'
 and shippable_flag = 'Y'
-	and o.header_id        = h.header_id
-	and h.org_id           = 83
-	and h.order_source_id  = 10
-	and o.project_id       = wdj.project_id(+)
-	and ordered_item_id    = wdj.primary_item_id(+)
-	and o.ship_from_org_id = wdj.organization_id(+)
+    and o.header_id        = h.header_id
+    and h.org_id           = 83
+    and h.order_source_id  = 10
+    and o.project_id       = wdj.project_id(+)
+    and ordered_item_id    = wdj.primary_item_id(+)
+    and o.ship_from_org_id = wdj.organization_id(+)
 order by o.schedule_arrival_date
