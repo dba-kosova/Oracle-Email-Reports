@@ -19,6 +19,8 @@ from email.mime.image import MIMEImage
 from email import encoders
 import smtplib
 import os.path
+import sys
+from pathlib import Path
 
 class Email:
     
@@ -31,11 +33,11 @@ class Email:
         self.message = message
         self.htmlmessage = self.htmlMessage()
 
-        # send error emails
-        if report.endswith('error'):
+        # if testing or an error
+        if Path(sys.argv[0]).stem == 'test' or report.endswith('error'):
             self.subscriptions = [x.strip() for x in subscriptions['ErrorAddress'].split(',')]
             self.recipients = subscriptions['ErrorAddress']
-            
+       
         # send normal emails
         else:
             self.subscriptions = [x.strip() for x in subscriptions[self.report_name].split(',')]
@@ -74,7 +76,7 @@ class Email:
         fp.close()
 
         # send mail
-        server = smtplib.SMTP(email_settings['address'])
+        server = smtplib.SMTP(email_settings['address'],timeout=10)
         server.ehlo()
         server.sendmail(msg['From'], self.subscriptions, msg.as_string())
         server.close()
