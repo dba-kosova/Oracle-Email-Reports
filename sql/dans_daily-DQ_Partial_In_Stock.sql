@@ -163,6 +163,8 @@ where oeh.header_id = oel.header_id
 
 and oel.line_id = ola.line_id
 ) moves
+, wdj.schedule_group_name "Schedule Group"
+
 from 
 
 oe_order_lines_all ola
