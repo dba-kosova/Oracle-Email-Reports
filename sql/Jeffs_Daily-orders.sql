@@ -105,4 +105,3 @@ from
     )
 where rownum   = 1
     and line_id   = ola.line_id),promise_date) <= greatest(apps.xxbim_get_calendar_date('BIM', sysdate,5),'31-OCT-18')
-order by trunc(schedule_ship_date) asc
