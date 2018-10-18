@@ -43,22 +43,6 @@ def delete_dq_files(filename):
 
 def main(reportName): 
 
-    make_sql_files("orders-1_Open_Orders.sql", "Jeffs_Daily-orders.sql","""and wdj.status_type_disp = 'Released'
-    and ola.ship_from_org_id = 85
-    and nvl((select promise_date
-from
-    (
-        select hist_creation_date
-        , promise_date
-        ,header_id
-        ,line_id
-        from oe_order_lines_history h
-        where 1            =1
-            and promise_date is not null
-        order by hist_creation_date asc
-    )
-where rownum   = 1
-    and line_id   = ola.line_id),promise_date) <= apps.xxbim_get_calendar_date('BIM', sysdate,5)""")
 
     make_sql_files("transactions-Yesterday.sql", "Jeffs_Daily-WIP_Completion.sql","""    and transaction_type_id = 44
 """)
