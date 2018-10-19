@@ -19,6 +19,7 @@ where we.organization_id  = 85
 	or we.line_code <> 'PT'
 	or we.line_code <> 'TB'
 	or we.line_code <> 'UL'
+    or we.line_code <> 'UB'
 	or we.line_code <> 'EF'
 	or we.line_code <> 'DW'
 	and we.wip_entity_id       = wro.wip_entity_id
