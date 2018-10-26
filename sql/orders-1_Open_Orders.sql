@@ -164,7 +164,7 @@ where oeh.header_id = oel.header_id
 and oel.line_id = ola.line_id
 ) moves
 , wdj.schedule_group_name "Schedule Group"
-
+, substr(msi.segment1, 0,instr(msi.segment1,'-')-1) "Prefix"
 from 
 
 oe_order_lines_all ola
