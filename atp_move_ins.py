@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # atp_move_ins.py
 
 """
@@ -9,18 +10,11 @@
 
 """
 
-import requests
-import json
-from lxml import html
-import datetime
-import xlsxwriter
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_email import Email
-from my_database import Database
+from functions import *
 
 requests.packages.urllib3.disable_warnings()
+
+print(Path(__file__).parents[0])
 
 def get_current_atp(item,quantity):
     
@@ -133,9 +127,9 @@ def get_test_info(header_id, line_id):
 
 def main(reportName):
     workbook_name="atp_move_ins"
-    my_path = os.path.join(os.path.dirname( __file__ ),'excel')
-    my_excel_path =my_path + "\\"+ workbook_name.replace(" ","_") + '.xlsx'
-    workbook = xlsxwriter.Workbook(my_excel_path)
+    my_path = Path(__file__).parents[0].joinpath('excel')
+    my_excel_path =my_path.joinpath(workbook_name.replace(" ","_")).with_suffix('.xlsx')
+    workbook = xlsxwriter.Workbook(str(my_excel_path))
 
     # get 50 top sellers, non shelving, from FP and OL
     sql = """select order_number
@@ -329,11 +323,10 @@ def build_worksheet_from_data(workbook, sheet, header, cur):
     
 reportName = "ATP Check - Move Ins"
 
-try:
-    main(reportName)
-
-except BaseException as e:
-    print(str(e))
-    Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
-    pass
-
+if __name__ == '__main__':
+    try:
+        main(reportName)
+    except BaseException as e:
+        print(str(e))
+        Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
+        pass

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # brdr.py
 
 """ 
@@ -8,12 +9,7 @@
     
 """
 
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_email import Email
-from my_workbook import Workbook
-from my_database import Database
+from functions import *
 
 def main(reportName):
 
@@ -28,7 +24,7 @@ def main(reportName):
     me.oracle_connect()
 
     # run report sql statement
-    cur = me.run_url(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'sql','brdr-BRDR.sql')))
+    cur = me.run_url(str(Path(__file__).parents[0].joinpath('sql','brdr-BRDR.sql')))
 
     header = ["Item", "Description","EAU", "Planner", "Buyer", "Order Type", "Days Late"]
     html = "<table border=\"1px solid black\" align=\"center\" cellpadding=\"3\"><tr style=\"background-color:  #b3b3b3\">"     
@@ -63,11 +59,12 @@ def main(reportName):
     # send report
     Email(reportName, html).SendMail()
 
-reportName = "BRDR"
+if __name__ == '__main__':
+    reportName = "BRDR"
 
-try:
-    main(reportName)
-except BaseException as e:
-    print(str(e))
-    Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
-    pass
+    try:
+        main(reportName)
+    except BaseException as e:
+        print(str(e))
+        Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
+        pass

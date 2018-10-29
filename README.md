@@ -48,6 +48,8 @@ subscriptions = {
 ```
 3. Add reports. This is done by dropping sql files into the /sql/ folder. The naming convention must be: report_name-excel_tab_name.sql
 
+4. Testing. Run the test.py script to do full testing or tweak as needed for other tests.
+
 ## Server Setup
 This package is current setup for windows IIS server using the task scheduler.
 1. Create a new task in task scheduler.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # basic_reports.py
  
 """
@@ -10,17 +11,13 @@
 
 """
 
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_workbook import Workbook
-from my_email import Email
+from functions import *
 
 def main(reportName):
    
     # create worksheets
     me = Workbook(reportName)
-    my_path = me.build_workbook()
+    me.build_workbook()
 
     # send emails
     htmlTable = None

@@ -156,7 +156,7 @@ where oeh.header_id = oel.header_id
 	and oeh.booked_flag                                                      = 'Y'
 	and nvl(hist.date_changed, greatest(oeh.booked_date, oel.creation_date)) >oeh.booked_date+2
 	--and oel.open_flag = 'Y'
-	and oel.link_to_line_id is null
+	--and oel.link_to_line_id is null
 	and oel.shippable_flag   = 'Y'
 	and oel.ship_from_org_id = 85
 	and oel.line_id          = hist.line_id
@@ -164,7 +164,7 @@ where oeh.header_id = oel.header_id
 and oel.line_id = ola.line_id
 ) moves
 , wdj.schedule_group_name "Schedule Group"
-
+, substr(msi.segment1, 0,instr(msi.segment1,'-')-1) "Prefix"
 from 
 
 oe_order_lines_all ola

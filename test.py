@@ -1,9 +1,22 @@
+# -*- coding: utf-8 -*-
+# test.py
 
+"""
+    @author: Christopher Pickering
+    
+    This script is used to run automated testing on all the email reports.
+    It can be run on the development side or production server. The email recipient 
+    address will automacitally be changed to the error address in the my_email.py 
+    script.
 
-import sys
-from pathlib import Path
+    Two sets of test are run
+        1. Anything in the basic report group
+        2. Anything with a dedicated file
+
+"""
+
+from functions import *
 import basic_reports
-import time
 
 def timeit(method):
     def timed(*args, **kw):
@@ -20,6 +33,8 @@ def timeit(method):
 
     return timed
 
+
+
 # get sql prefix
 sql_report_list = set([x.stem.split('-')[0] for x in Path(__file__).parents[0].joinpath('sql').glob('*.sql') ])
 
@@ -32,12 +47,13 @@ basic_report_list = list(sql_report_list - non_basic_report_list)
 
 # test basic reports
 for report in basic_report_list:
-    if str(report) == 'test1':
-        timeit(basic_reports.main)(report)
+    #if str(report) == 'test1':
+    print(report)
+    timeit(basic_reports.main)(report)
 
 # for static reports
 for report in non_basic_report_list:
-    if str(report) == 'test2':
+    #if str(report) == 'test2':
 
-        my_module = __import__(report, ['main']) 
-        timeit(my_module.main)()
+    my_module = __import__(report, ['main']) 
+    timeit(my_module.main)()

@@ -8,7 +8,7 @@
 
 """
 
-from my_settings import subscriptions, email_settings
+from functions.my_settings import subscriptions, email_settings
 import time
 from datetime import date
 import calendar
@@ -18,7 +18,6 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email import encoders
 import smtplib
-import os.path
 import sys
 from pathlib import Path
 
@@ -27,7 +26,7 @@ class Email:
     def __init__(self,report,message):
         self.report_name = report.replace("_",' ').lower()
         self.subject = report.replace("_",' ') + " " + time.strftime("%d-%b-%y")
-        self.file_location = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname( __file__ )),'excel',report + '.xlsx'))
+        self.file_location = Path(__file__).parents[1].joinpath('excel',report).with_suffix('.xlsx')
         report = report.replace("_"," ")
         self.report = report
         self.message = message
@@ -58,7 +57,7 @@ class Email:
         msg.attach(MIMEText(self.htmlmessage, 'html'))
 
         # add attachment
-        if os.path.isfile(self.file_location):
+        if self.file_location.is_file():
 
             part = MIMEBase('application', "octet-stream")
             part.set_payload(open(self.file_location, "rb").read())
@@ -69,7 +68,7 @@ class Email:
 
         # add logo signature
         # for this to work the img src must be "cid:<image1>"
-        fp = open(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'logo.png')),'rb')
+        fp = open(str(Path(__file__).parents[1].joinpath('templates','logo').with_suffix('.png')),'rb')
         msgImage = MIMEImage(fp.read())
         msgImage.add_header('Content-ID', '<image1>')
         msg.attach(msgImage)
@@ -88,7 +87,7 @@ class Email:
         my_day = calendar.day_name[date.today().weekday()]
 
         # open html email
-        html = open(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'report.html'))).read()
+        html = open(str(Path(__file__).parents[1].joinpath('templates','report').with_suffix('.html'))).read()
 
         # insert my text into email
         html = html.replace('ReportName',self.report)

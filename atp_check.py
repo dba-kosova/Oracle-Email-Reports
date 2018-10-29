@@ -9,15 +9,7 @@
 
 """
 
-import requests
-import json
-from lxml import html
-import datetime
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_email import Email
-from my_database import Database
+from functions import *
 
 requests.packages.urllib3.disable_warnings()
 
@@ -169,10 +161,11 @@ and msi.organization_id = cat.organization_id(+)
 
 reportName = "ATP Check"
 
-try:
-    main(reportName)
-except BaseException as e:
-    print(str(e))
-    Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
-    pass
 
+if __name__ == '__main__':
+    try:
+        main(reportName)
+    except BaseException as e:
+        print(str(e))
+        Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
+        pass

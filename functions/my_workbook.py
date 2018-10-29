@@ -16,19 +16,16 @@
 """
 
 import xlsxwriter
-import os
 import fnmatch
-from os import listdir
-from os.path import isfile, join
-from os.path import basename
-from my_database import Database
+from functions.my_database import Database
+from pathlib import Path
 
 class Workbook:
     def __init__(self,workbook_name):
         
         # define paths
-        self.my_sql_path = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname( __file__ )),'sql'))
-        self.my_excel_path =os.path.join(self.my_sql_path.replace('sql','excel'),workbook_name.replace(" ","_") + '.xlsx')
+        self.my_sql_path = Path(__file__).parents[1].joinpath('sql')
+        self.my_excel_path = Path(__file__).parents[1].joinpath('excel',workbook_name.replace(" ","_")).with_suffix('.xlsx')
 
         # define workbook
         self.workbook_name = workbook_name.lower()
@@ -37,16 +34,17 @@ class Workbook:
 
     def tab_list(self):
         result = []
-        for root, dirs, files in os.walk(self.my_sql_path):
-            for file in sorted(files, key=str.lower):
-                if fnmatch.fnmatch(file.lower(), self.workbook_name + '-*.sql') == True:
-                    result.append(os.path.join(root, file))
+        for file in self.my_sql_path.glob('*.sql'):        
+            if fnmatch.fnmatch(file.stem.split('-')[0].lower(), self.workbook_name) == True:
+                result.append(str(file))
+
         return result
 
     def build_workbook(self):
 
         if self.workbook_name.lower() == 'quickship':
             return self.create_print_worksheets()
+
         else:
             return self.create_worksheets()
 
@@ -83,7 +81,7 @@ class Workbook:
                     cur = me.run_url(url)
 
             header = [i[0] for i in cur.description]
-            sheet = self.workbook.add_worksheet(basename(url).split(".")[0].split("-")[-1].replace("_"," "))
+            sheet = self.workbook.add_worksheet(Path(url).stem.split('-')[-1].replace('_',' '))
             sheet.freeze_panes(1,0)
             sheet.set_column(0,len(header),18)
 
@@ -166,7 +164,7 @@ class Workbook:
             
             # set sheet formats. add header
             header = [i[0] for i in cur.description]
-            sheet = self.workbook.add_worksheet(basename(url).split(".")[0].split("-")[-1].replace("_"," "))
+            sheet = self.workbook.add_worksheet(Path(url).stem.split('-')[-1].replace('_',' '))
             sheet.freeze_panes(1,0)
             sheet.set_column(0,0,6.3)
             sheet.set_column(1,1,3.67)

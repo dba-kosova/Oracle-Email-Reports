@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # onhold.py
 
 """
@@ -7,11 +8,7 @@
 
 """
 
-import sys
-import os.path
-sys.path.append(os.path.join(os.path.dirname( __file__ ),'functions'))
-from my_email import Email
-from my_database import Database
+from functions import *
 
 def main(reportName):
 
@@ -20,7 +17,7 @@ def main(reportName):
     me.oracle_connect()
 
     # run report sql statement
-    cur = me.run_url(os.path.abspath(os.path.join(os.path.dirname( __file__ ),'sql','onhold-1.sql')))
+    cur = me.run_url(Path(__file__).parents[0].joinpath('sql','onhold-1.sql'))
 
     header = ["Line", "Project", "Job", "DFF","Date Released", "Assembly", "Item", "Qty ATT", "Job Qty"]
     html = "<table border=\"1px solid black\" align=\"center\" cellpadding=\"3\"><tr style=\"background-color:  #b3b3b3\">"
@@ -59,10 +56,11 @@ def main(reportName):
 
 reportName = "On Hold"
 
-try:
-    main(reportName)
 
-except BaseException as e:
-    print(str(e))
-    Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
-    pass
+if __name__ == '__main__':
+    try:
+        main(reportName)
+    except BaseException as e:
+        print(str(e))
+        Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
+        pass

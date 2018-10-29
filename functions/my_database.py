@@ -30,8 +30,8 @@
 import cx_Oracle
 import pyodbc
 
-from my_settings import ora_con_str
-from my_settings import msql_con_str
+from functions.my_settings import ora_con_str
+from functions.my_settings import msql_con_str
 
 class Database:
     def __init__(self):
