@@ -122,5 +122,5 @@ and cancel_flag <> 'Y'
 and exists ( select * from rcv_msl_v rm
 where item_id = pr.item_id
 and rm.requisition_line_Id = pr.requisition_Line_Id))
---where source_org = 'BMX'
+where source_org = 'BMX'
 order by 8 asc

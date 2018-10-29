@@ -60,6 +60,6 @@ select
 from mtl_material_transactions mmt
 
 where mmt.organization_id     = 85
-	and transaction_date  between apps.xxbim_get_calendar_date('BIM', sysdate, -1) and trunc(sysdate)
+	and transaction_date  between trunc(trunc(sysdate, 'WW')-1,'WW') and trunc(sysdate, 'WW')-1
     --and transaction_type_id = 44
     order by 3

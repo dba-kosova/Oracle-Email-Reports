@@ -137,7 +137,7 @@ from
 			and l.order_source_id <> 10
 			and l.header_id        = h.header_id
 			and l.shippable_flag   = 'Y'
-	and trunc(l.request_date) > trunc(l.promise_date)
+	and trunc(l.request_date-2) > trunc(l.promise_date)
 			and l.ship_to_org_id     = b.site_use_id -- or a.invoice_to_org_id
 			and d.party_id           = e.party_id
 			and c.cust_account_id    = d.cust_account_id
