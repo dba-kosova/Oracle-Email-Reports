@@ -60,7 +60,7 @@ class Email:
         if self.file_location.is_file():
 
             part = MIMEBase('application', "octet-stream")
-            part.set_payload(open(self.file_location, "rb").read())
+            part.set_payload(open(str(self.file_location), "rb").read())
 
             part.add_header('Content-Disposition', 'attachment; filename=' + self.subject.replace(' ','_') + '.xlsx')
             encoders.encode_base64(part)

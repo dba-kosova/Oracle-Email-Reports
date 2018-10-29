@@ -29,7 +29,7 @@ class Workbook:
 
         # define workbook
         self.workbook_name = workbook_name.lower()
-        self.workbook = xlsxwriter.Workbook(self.my_excel_path)
+        self.workbook = xlsxwriter.Workbook(str(self.my_excel_path))
         self.workbook_tab_list = self.tab_list()
 
     def tab_list(self):
@@ -81,7 +81,7 @@ class Workbook:
                     cur = me.run_url(url)
 
             header = [i[0] for i in cur.description]
-            sheet = self.workbook.add_worksheet(Path(url).stem.split('-')[-1].replace('_',' '))
+            sheet = self.workbook.add_worksheet(str(Path(url).stem.split('-')[-1].replace('_',' ')))
             sheet.freeze_panes(1,0)
             sheet.set_column(0,len(header),18)
 
@@ -113,7 +113,7 @@ class Workbook:
 
         me.close()  
         self.close()   
-        return self.my_excel_path
+        return str(self.my_excel_path)
 
     def create_print_worksheets(self):
 
@@ -164,7 +164,7 @@ class Workbook:
             
             # set sheet formats. add header
             header = [i[0] for i in cur.description]
-            sheet = self.workbook.add_worksheet(Path(url).stem.split('-')[-1].replace('_',' '))
+            sheet = self.workbook.add_worksheet(str(Path(url).stem.split('-')[-1].replace('_',' ')))
             sheet.freeze_panes(1,0)
             sheet.set_column(0,0,6.3)
             sheet.set_column(1,1,3.67)
@@ -219,7 +219,7 @@ class Workbook:
     
         me.close()
         self.close()
-        return self.my_excel_path
+        return str(self.my_excel_path)
 
     def close(self):
         self.workbook.close()
