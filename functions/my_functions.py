@@ -3,7 +3,7 @@ from pathlib import Path
 
 def make_sql_file(source, filename, sql):
 
-    home_path = Path(__file__).parents[0].joinpath('sql')
+    home_path = Path(__file__).parents[1].joinpath('sql')
     new_file = str(home_path.joinpath(filename))
     old_file = str(home_path.joinpath(source))
    

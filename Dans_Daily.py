@@ -12,6 +12,7 @@
 from functions import *
 
 def main(reportName):
+    dq_all = "dans_daily-DQ_All.sql"
     make_sql_file("onhand_nonshippable_locations-1.sql","dans_daily-OnHand_NonShippable.sql","")
     make_sql_file("orders-Orders.sql", "dans_daily-DQ_All.sql","""    and greatest(ola.request_date, nvl((select promise_date
     from
