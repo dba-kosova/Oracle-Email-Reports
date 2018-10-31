@@ -11,9 +11,7 @@
 from functions import *
 
 def main(reportName): 
-    make_sql_file("inventory-Transactions.sql", "Jeffs_Daily-WIP_Completion.sql","""    and transaction_type_id = 44
-""")
-  
+      
     #initialize workbook
     my_workbook = Workbook(reportName)
 

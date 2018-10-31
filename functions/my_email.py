@@ -20,27 +20,37 @@ from email import encoders
 import smtplib
 import sys
 from pathlib import Path
+import jinja2
+import json
 
 class Email:
     
     def __init__(self,report,message):
+
         self.report_name = report.replace("_",' ').lower()
         self.subject = report.replace("_",' ') + " " + time.strftime("%d-%b-%y")
         self.file_location = Path(__file__).parents[1].joinpath('excel',report).with_suffix('.xlsx')
-        report = report.replace("_"," ")
-        self.report = report
-        self.message = message
-        self.htmlmessage = self.htmlMessage()
 
+        # get today
+        today = calendar.day_name[date.today().weekday()]
+
+        # import templates
+        templates = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(str(Path(__file__).parents[1] / 'templates')),trim_blocks=True)
+
+        message_data = {'message':message,'today':today,'report_name':self.report_name}
+
+        self.message = templates.get_template('report.html').render(message_data)
+        
         # if testing or an error
-        if Path(sys.argv[0]).stem == 'test' or report.endswith('error'):
+        if Path(sys.argv[0]).stem == 'test' or self.report_name.endswith('error'):
             self.subscriptions = [x.strip() for x in subscriptions['ErrorAddress'].split(',')]
             self.recipients = subscriptions['ErrorAddress']
        
         # send normal emails
         else:
             self.subscriptions = [x.strip() for x in subscriptions[self.report_name].split(',')]
-            self.recipients = subscriptions[self.report_name]
+            self.recipients = subscriptions[self.report_name]          
 
     def SendMail(self):
 
@@ -54,7 +64,7 @@ class Email:
         msg['Reply-To'] = email_settings['reply_to']
 
         # email message
-        msg.attach(MIMEText(self.htmlmessage, 'html'))
+        msg.attach(MIMEText(self.message, 'html'))
 
         # add attachment
         if self.file_location.is_file():
@@ -79,23 +89,3 @@ class Email:
         server.ehlo()
         server.sendmail(msg['From'], self.subscriptions, msg.as_string())
         server.close()
-
-
-    def htmlMessage(self):
-
-        # get day of the week
-        my_day = calendar.day_name[date.today().weekday()]
-
-        # open html email
-        html = open(str(Path(__file__).parents[1].joinpath('templates','report').with_suffix('.html'))).read()
-
-        # insert my text into email
-        html = html.replace('ReportName',self.report)
-
-        if self.message == None:
-            html = html.replace('ReportMessage',"The file is attached.")
-        else:
-            html = html.replace('ReportMessage',self.message)
-        html = html.replace('Today',my_day)
-
-        return html

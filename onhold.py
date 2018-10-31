@@ -17,7 +17,7 @@ def main(reportName):
     me.oracle_connect()
 
     # run report sql statement
-    cur = me.run_url(Path(__file__).parents[0].joinpath('sql','onhold-1.sql'))
+    cur = me.run_url(str(Path(__file__).parents[0].joinpath('sql','onhold-1.sql')))
 
     header = ["Line", "Project", "Job", "DFF","Date Released", "Assembly", "Item", "Qty ATT", "Job Qty"]
     html = "<table border=\"1px solid black\" align=\"center\" cellpadding=\"3\"><tr style=\"background-color:  #b3b3b3\">"

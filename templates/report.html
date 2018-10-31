@@ -12,15 +12,17 @@
             Hello,
         </p>
         <p>
-            Thanks for subscribing to the ReportName report.
+            Thanks for subscribing to the {{ report_name }} report.
         </p>
         <p>
-            ReportMessage
+            {% block message_body %}
+                {{ message if message != None else 'The file is attached.' }}
+            {% endblock %}
         </p>
         <p>
             Contact me if there is an issue or you would like to unsubscribe.
             <br>
-            Have a happy Today,
+            Have a happy {{ today }},
         </p>
         
         <p style="margin-bottom:10.0pt">

@@ -56,9 +56,8 @@ class Database:
         f = open(url,'r')
         stmt = f.read()
         f.close()
-
         return self.cursor.execute(stmt)
-
+        
     def close(self):
         self.cursor.close()
         self.connection.close()

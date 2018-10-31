@@ -18,10 +18,9 @@ def main(reportName):
     # create worksheets
     me = Workbook(reportName)
     me.build_workbook()
-
+    
     # send emails
-    htmlTable = None
-    Email(reportName, htmlTable).SendMail()
+    Email(reportName, None).SendMail()
 
 if __name__ == '__main__': 
     reportName = sys.argv[1]
@@ -31,5 +30,6 @@ if __name__ == '__main__':
 
     # if report fails then send notification to th eerror address with error message    
     except BaseException as e:
-        Email(reportName + ' error', "<br><center>" + str(e) + "</center>").SendMail()
+        print(e)
+        Email(reportName + ' error', str(e)).SendMail()
         pass
