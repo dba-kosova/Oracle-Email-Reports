@@ -1,12 +1,15 @@
-select distinct
- wdj.wip_entity_name "Job"
-, pjm.project_number "Project"
-, (select attribute1 from bom_operational_routings b where alternate_routing_designator is null and b.organization_id = ola.ship_from_org_id and assembly_item_id = ola.inventory_item_id) "Line"
+select 
+wip_entity_name "Job"
+, project_name "Project"
+, line_code "Line"
 , msi.segment1 "Item"
-, substr(msi.description,0,30) "Description"
-, wdj.quantity_remaining "Open Qty"
-, wdj.date_released "Released"
-, nvl((select promise_date
+, substr(msi.description,0,20) "Description"
+, to_number(quantity_remaining) "Open QTY"
+, date_released "Released"
+
+
+
+, nvl(nvl((select promise_date
 from
 	(
 		select hist_creation_date
@@ -19,18 +22,21 @@ from
 		order by hist_creation_date asc
 	)
 where rownum   = 1
-	and line_id   = ola.line_id),promise_date) "1st Promise Date"
+	and line_id   = mr.demand_source_line_id),(select promise_date from oe_order_lines_all where line_id = mr.demand_source_line_id)),scheduled_completion_date) "1st Promise Date"
 
 
-, ola.attribute20 "Blanket"
+, (select attribute20 from oe_order_lines_all where line_id = mr.demand_source_line_id) "Blanket"
 
-    
+
+
+, wdj.schedule_group_name "Schedule Group"
+
      , round(nvl(
 	(
 		select ola2.unit_selling_price
 		from oe_order_lines_all ola2
 		, oe_order_headers_all oha2
-		where ola.header_id           = oha.header_id
+		where 1=1
 			and ola.header_id            = ola2.header_id
 			and ola2.header_id           = oha2.header_id
 			and oha.order_number         = oha2.order_number
@@ -41,67 +47,42 @@ where rownum   = 1
 			and rownum = 1
 	)
 	,0),2) * nvl(reservation_quantity,ordered_quantity)  "Total Price"
-    
-, e.party_name "Customer"
 
-, wdj.schedule_group_name "Schedule Group"
 
-from 
+, decode(nvl(to_char(demand_source_header_id), 'None'), 'None', 'None', 'Yes') "Sales Order"
 
-oe_order_lines_all ola
-, oe_order_headers_all oha
-, PJM_SEIBAN_NUMBERS pjm
-, MTL_RESERVATIONS_ALL_v mra
-, wip_discrete_jobs_v wdj
+from wip_discrete_jobs_v wdj
 , mtl_system_items_b msi
-,hz_cust_accounts d
-, hz_parties e
-, hz_cust_acct_sites_all c
-, hz_cust_site_uses_all b
+, mtl_reservations mr
+, oe_order_lines_all ola
+, oe_order_headers_all oha
+where wdj.organization_id      = 85
+	and status_type_disp         = 'Released'
 
-,hz_cust_accounts d2
-, hz_parties e2
-, hz_cust_acct_sites_all c2
-, hz_cust_site_uses_all b2
-where ola.header_id = oha.header_id
-and ola.project_id = pjm.project_id
-and ola.open_flag = 'Y'
-and ola.shippable_flag = 'Y'
-and ola.cancelled_flag = 'N'
-and ola.booked_flag = 'Y'
-and ola.org_id = 83
-and ola.line_id = mra.demand_source_line_id(+)
-and mra.supply_source_header_id = wdj.wip_entity_id(+)
-and ola.ship_from_org_id = msi.organization_id
-and ola.inventory_item_id = msi.inventory_item_id
-
-
-
-and ola.ship_to_org_id = b.site_use_id -- or a.invoice_to_org_id
-	and d.party_id          = e.party_id
-	and c.cust_account_id   = d.cust_account_id
-	and b.cust_acct_site_id = c.cust_acct_site_id
-	and ola.invoice_to_org_id = b2.site_use_id -- or a.invoice_to_org_id
-	and d2.party_id          = e2.party_id
-	and c2.cust_account_id   = d2.cust_account_id
-	and b2.cust_acct_site_id = c2.cust_acct_site_id
-    and ola.order_source_id <> 10 -- internal orders
-    and ola.source_type_code <> 'EXTERNAL'
-    and ola.line_type_id not in (1073,1077,1127) -- return, sample, vendor order
+	and wdj.organization_id       = msi.organization_id
+	and wdj.primary_item_id       = msi.inventory_item_id
+	and wdj.wip_entity_id         = mr.supply_source_header_id(+)
+    and ola.header_id = oha.header_id(+)
+    and mr.demand_source_line_id = ola.line_id(+)
+    and line_code not in ('JIT','NJIT', 'OSV')
     
-and wdj.status_type_disp = 'Released'
-    and ola.ship_from_org_id = 85
-    and nvl((select promise_date
+and
+nvl(nvl((select promise_date
 from
-    (
-        select hist_creation_date
-        , promise_date
-        ,header_id
-        ,line_id
-        from oe_order_lines_history h
-        where 1            =1
-            and promise_date is not null
-        order by hist_creation_date asc
-    )
+	(
+		select hist_creation_date
+		, promise_date
+		,header_id
+		,line_id
+		from oe_order_lines_history h
+		where 1            =1
+			and promise_date is not null
+		order by hist_creation_date asc
+	)
 where rownum   = 1
-    and line_id   = ola.line_id),promise_date) <= greatest(apps.xxbim_get_calendar_date('BIM', sysdate,5),'31-OCT-18')
+	and line_id   = mr.demand_source_line_id),(select promise_date from oe_order_lines_all where line_id = mr.demand_source_line_id)),scheduled_completion_date) <= apps.xxbim_get_calendar_date('BIM', sysdate, 5)
+    
+    
+    ;
+    
+    describe inv.mtl_reservations
