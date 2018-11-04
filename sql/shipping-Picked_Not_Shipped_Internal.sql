@@ -75,3 +75,4 @@ where 1                                                                =1
 	and picks.organization_id                                             = locator.organization_id(+)
 	and picks.transfer_locator_id                                                  = transfer_locator.inventory_location_id(+)
 	and picks.organization_id                                             = transfer_locator.organization_id(+)
+	order by transaction_date asc

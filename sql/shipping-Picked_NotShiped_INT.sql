@@ -92,3 +92,4 @@ where 1                                                                =1
 	    	and o.header_id       = prc.header_id
 	and o.line_number     = prc.line_number
 	and o.shipment_number = prc.shipment_number
+		order by transaction_date asc
