@@ -80,7 +80,7 @@ from
 		order by hist_creation_date asc
 	)
 where rownum   = 1
-	and line_id   = mr.demand_source_line_id),(select promise_date from oe_order_lines_all where line_id = mr.demand_source_line_id)),scheduled_completion_date) <= apps.xxbim_get_calendar_date('BIM', sysdate, 5)
+	and line_id   = mr.demand_source_line_id),(select promise_date from oe_order_lines_all where line_id = mr.demand_source_line_id)),scheduled_completion_date) <= apps.xxbim_get_calendar_date('BIM', sysdate, 90)
     
    
    
