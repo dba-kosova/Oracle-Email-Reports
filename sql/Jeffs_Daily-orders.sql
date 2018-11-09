@@ -6,9 +6,6 @@ wip_entity_name "Job"
 , substr(msi.description,0,20) "Description"
 , to_number(quantity_remaining) "Open QTY"
 , date_released "Released"
-
-
-
 , nvl(nvl((select promise_date
 from
 	(
@@ -51,6 +48,21 @@ where rownum   = 1
 
 , decode(nvl(to_char(demand_source_header_id), 'None'), 'None', 'None', 'Yes') "Sales Order"
 
+, case when nvl((select wo.quantity_completed
+from wip_operations wo
+,    wip_discrete_jobs_v wd
+,    mtl_system_items_b msi
+where wo.organization_id = 85
+  and wd.organization_id = wo.organization_id
+  and wo.wip_entity_id = wd.wip_entity_id
+  and msi.organization_id = wd.organization_id
+  and msi.inventory_item_id = wd.primary_item_id
+  and wd.wip_entity_id = wdj.wip_entity_id
+  --and wd.status_type_disp = 'Released'
+  --and line_code = 'OL'
+  and rownum = 1
+),0) > 0 then 'in assembly' else 'before assembly' end "Location"
+
 from wip_discrete_jobs_v wdj
 , mtl_system_items_b msi
 , mtl_reservations mr
@@ -84,3 +96,5 @@ where rownum   = 1
     
    
    
+    
+    
