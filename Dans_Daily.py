@@ -74,7 +74,7 @@ def main(reportName):
                             , '1', 'No', null ,'No', 'Ship Set') = 'No'
         """)
 
-    make_sql_file("orders-Orders.sql","dans_daily-Future_Orders.sql","""  and ola.request_date > apps.xxbim_get_calendar_date('BIM', sysdate, 30)""")
+    make_sql_file("orders-Orders.sql","dans_daily-Blanket_Health.sql","""  and ola.request_date > apps.xxbim_get_calendar_date('BIM', sysdate, 30)""")
 
     #initialize workbook
     my_workbook = Workbook(reportName)
