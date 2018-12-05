@@ -89,6 +89,7 @@ where 1                                                                =1
 	and picks.transfer_locator_id                                                  = transfer_locator.inventory_location_id(+)
 	and picks.organization_id                                             = transfer_locator.organization_id(+)
 	and e.country = 'US'
+	and e.party_name not in ('CPI AUTOMATION LTD.','NILPETER - INDIA','C.H. Robinson Freight Services')
     	and o.header_id       = prc.header_id
 	and o.line_number     = prc.line_number
 	and o.shipment_number = prc.shipment_number
