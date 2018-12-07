@@ -74,7 +74,7 @@ where 1                                                                =1
 	and o.order_source_id                                                <> 10
 	and o.shippable_flag                                                  = 'Y'
 	and source_type_code                                                 <> 'EXTERNAL'
-	and o.ship_from_org_id                                                in ( 85,90)
+	and o.ship_from_org_id                                                in ( 85)
 	and o.open_flag                                                       = 'Y'
 	and o.cancelled_flag                                                  = 'N'
 	and oe_line_status_pub.get_line_status(o.line_id, o.flow_status_code) = 'Picked'
