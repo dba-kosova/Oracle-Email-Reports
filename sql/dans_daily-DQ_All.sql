@@ -165,6 +165,25 @@ and oel.line_id = ola.line_id
 ) moves
 , wdj.schedule_group_name "Schedule Group"
 , substr(msi.segment1, 0,instr(msi.segment1,'-')-1) "Prefix"
+, decode(nvl((select wip_entity_name
+from wip_discrete_jobs_v we
+where we.organization_id     = 85
+and we.status_type          = 1                                                 --unreleased
+and we.scheduled_start_date > apps.xxbim_get_calendar_date('BIM', sysdate, -90) --just to make it faster
+and line_code not                                                          in ( 'JIT', 'CSD', 'NJIT', 'OSV', 'FC', 'ACC')
+and line_code not like 'SUB%'
+and not exists
+( -- this will list any "open" job (released, unreleased, on hold.. and canceled incase there was a recut)
+              select project_id
+              , status_type_disp
+              from wip_discrete_jobs_v
+              where line_code       = 'JIT'
+                             and status_type not in (4,12) -- closed/complete
+                             and project_id       = we.project_id
+)
+
+and we.wip_entity_name = wdj.wip_entity_name
+group by we.wip_entity_name),'No'),'No','No','Yes') "In Staging - 90% accurate"
 from 
 
 oe_order_lines_all ola

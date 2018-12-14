@@ -227,19 +227,5 @@ and ola.ship_to_org_id = b.site_use_id -- or a.invoice_to_org_id
     and ola.source_type_code <> 'EXTERNAL'
     and ola.line_type_id not in (1073,1077,1127) -- return, sample, vendor order
     
-    and greatest(ola.request_date, nvl((select promise_date
-    from
-        (
-            select hist_creation_date
-            , promise_date
-            ,header_id
-            ,line_id
-            from oe_order_lines_history h
-            where 1            =1
-                and promise_date is not null
-            order by hist_creation_date asc
-        )
-    where rownum   = 1
-        and line_id   = ola.line_id),promise_date)) < trunc(sysdate)
-    and OE_LINE_STATUS_PUB.Get_Line_Status(ola.line_id, ola.flow_status_code) = 'Shipped'
+  and ola.request_date > apps.xxbim_get_calendar_date('BIM', sysdate, 30)
 order by trunc(schedule_ship_date) asc
