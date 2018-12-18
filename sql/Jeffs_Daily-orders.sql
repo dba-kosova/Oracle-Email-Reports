@@ -21,7 +21,7 @@ from
 	)
 where rownum   = 1
 	and line_id   = mr.demand_source_line_id),(select promise_date from oe_order_lines_all where line_id = mr.demand_source_line_id)),scheduled_completion_date) "1st Promise Date"
-
+, (select request_date from oe_order_lines_all where line_id = mr.demand_source_line_id)  "Request Date"
 
 , (select attribute20 from oe_order_lines_all where line_id = mr.demand_source_line_id) "Blanket"
 
