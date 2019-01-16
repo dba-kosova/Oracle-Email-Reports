@@ -78,6 +78,7 @@ from oe_order_lines_all oel
 where oel.open_flag                  = 'N'
 	and oel.org_id                      = 83
 	and oel.order_source_id            <> 10
+	and oel.ship_from_org_id = 90
     and oel.ship_from_org_id=  m.organization_id
     and oel.inventory_item_id =m.inventory_item_id
     and shippable_flag = 'Y'
