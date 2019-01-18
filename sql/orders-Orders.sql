@@ -1,4 +1,4 @@
-select distinct
+select distinct ola.line_id,
 decode(ola.ship_from_org_id,85,'BIM',90,'BMX') "Org"
 , wdj.wip_entity_name "Job"
 , pjm.project_number "Project"
@@ -11,6 +11,39 @@ decode(ola.ship_from_org_id,85,'BIM',90,'BMX') "Org"
 , wdj.quantity_remaining "Open Qty"
 , xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'ATR') "Qty ATR"
 , xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'TQ') "Qty TQ"
+, decode(decode(wdj.status_type_disp,'Released','1','Unreleased','1','On Hold','1','0'),'1', nvl((select
+    max((
+        select
+            min(old_schedule_date)
+        from
+            msc_supplies ord, msc.msc_system_items msc
+        where
+            ord.organization_id = 85
+            and order_type in(
+                1, 2, 3
+            ) --1:po, 2:purchase req, 3:wo, 4:null, 5:plannedOrder
+            and item_name = msi2.segment1
+            and ord.plan_id = msc.plan_id
+            and msc.plan_id = 21
+            and ord.organization_id = msc.organization_id
+            and ord.inventory_item_id = msc.inventory_item_id
+            --and old_schedule_date > apps.xxbim_get_calendar_date('BIM', sysdate, - 5)
+    )) supply_date
+from
+    wip_requirement_operations wro,
+    mtl_system_items_b msi2,
+    mfg_lookups wip_supply
+where
+    1 = 1
+    and wro.wip_entity_id = wdj.wip_entity_id
+    and wro.organization_id = wdj.organization_id
+    and wro.inventory_item_id = msi2.inventory_item_id
+    and wro.organization_id = msi2.organization_id
+    and wro.attribute2 is not null
+    and wro.attribute2 not like '0%'
+    and wro.wip_supply_type = wip_supply.lookup_code
+    and wip_supply.lookup_type = 'WIP_SUPPLY'
+    ), scheduled_start_date),nulll) "Planned Start Date"
 , wdj.date_released "Released"
 , ola.creation_date "Created"
 , trunc(ola.request_date) "Request"
@@ -25,7 +58,7 @@ from
 		,header_id
 		,line_id
 		from oe_order_lines_history h
-		where 1            =1
+		where 1=1
 			and promise_date is not null
 		order by hist_creation_date asc
 	)
