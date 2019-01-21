@@ -23,8 +23,41 @@ select distinct
     reservation_quantity      "Qty Reserved",
     wdj.quantity_remaining    "Open Qty",
     xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'ATR') "Qty ATR",
-    xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'TQ') "Qty TQ",
-    wdj.date_released         "Released",
+    xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'TQ') "Qty TQ"
+    , decode(decode(wdj.status_type_disp,'Released','1','Unreleased','1','On Hold','1','0'),'1', nvl((select
+    max((
+        select
+            min(old_schedule_date)
+        from
+            msc_supplies ord, msc.msc_system_items msc
+        where
+            ord.organization_id = 85
+            and order_type in(
+                1, 2, 3
+            ) --1:po, 2:purchase req, 3:wo, 4:null, 5:plannedOrder
+            and item_name = msi2.segment1
+            and ord.plan_id = msc.plan_id
+            and msc.plan_id = 21
+            and ord.organization_id = msc.organization_id
+            and ord.inventory_item_id = msc.inventory_item_id
+            --and old_schedule_date > apps.xxbim_get_calendar_date('BIM', sysdate, - 5)
+    )) supply_date
+from
+    wip_requirement_operations wro,
+    mtl_system_items_b msi2,
+    mfg_lookups wip_supply
+where
+    1 = 1
+    and wro.wip_entity_id = wdj.wip_entity_id
+    and wro.organization_id = wdj.organization_id
+    and wro.inventory_item_id = msi2.inventory_item_id
+    and wro.organization_id = msi2.organization_id
+    and wro.attribute2 is not null
+    and wro.attribute2 not like '0%'
+    and wro.wip_supply_type = wip_supply.lookup_code
+    and wip_supply.lookup_type = 'WIP_SUPPLY'
+    ), scheduled_start_date),null) "Planned Start Date"
+    ,wdj.date_released         "Released",
     ola.creation_date         "Created",
     trunc(ola.request_date) "Request",
     trunc(ola.schedule_ship_date) "Schedule Ship",
@@ -201,13 +234,13 @@ select distinct
             ) hist
         where
             oeh.header_id = oel.header_id
-	--AND oeh.open_flag = 'Y'
+    --AND oeh.open_flag = 'Y'
             and oeh.header_id = oha.header_id
-	--and oel.line_number                                                      = '1'
+    --and oel.line_number                                                      = '1'
             and oeh.booked_flag = 'Y'
             and nvl(hist.date_changed, greatest(oeh.booked_date, oel.creation_date)) > oeh.booked_date + 2
-	--and oel.open_flag = 'Y'
-	--and oel.link_to_line_id is null
+    --and oel.open_flag = 'Y'
+    --and oel.link_to_line_id is null
             and oel.shippable_flag = 'Y'
             and oel.ship_from_org_id = 85
             and oel.line_id = hist.line_id
