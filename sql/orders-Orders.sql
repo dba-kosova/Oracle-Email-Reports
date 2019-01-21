@@ -43,7 +43,7 @@ where
     and wro.attribute2 not like '0%'
     and wro.wip_supply_type = wip_supply.lookup_code
     and wip_supply.lookup_type = 'WIP_SUPPLY'
-    ), scheduled_start_date),nulll) "Planned Start Date"
+    ), scheduled_start_date),null) "Planned Start Date"
 , wdj.date_released "Released"
 , ola.creation_date "Created"
 , trunc(ola.request_date) "Request"
