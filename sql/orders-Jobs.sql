@@ -17,7 +17,7 @@ select decode(msi.organization_id, 85, 'BIM', 90, 'BMX') "Org"
  , decode(decode(wdj.status_type_disp,'Released','1','Unreleased','1','On Hold','1','0'),'1', nvl((select
     max((
         select
-            min(old_schedule_date)
+            trunc(min(old_schedule_date))
         from
             msc_supplies ord, msc.msc_system_items msc
         where
@@ -46,7 +46,7 @@ where
     and wro.attribute2 not like '0%'
     and wro.wip_supply_type = wip_supply.lookup_code
     and wip_supply.lookup_type = 'WIP_SUPPLY'
-    ), scheduled_start_date),null) "Planned Start Date"
+    ), trunc(scheduled_start_date)),null) "Planned Start Date"
 , scheduled_start_date "Schedule Start"
 , scheduled_completion_date "Schedule Completion"
 , date_released "Released"
