@@ -48,7 +48,7 @@ select msi.segment1 "Item"
 			else 0
 		end,1) "Act MOH"
 , decode((nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)),0,9999,round(on_hand_qty / (nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)),1)) "Mfg MOH"
-, to_char(msi.creation_date, 'DD/MM/YYYY') "Creation Date"
+, to_char(msi.creation_date, 'MM/DD/YY') "Creation Date"
 from mtl_system_items_b msi
 , cst_item_costs cic
 , (
