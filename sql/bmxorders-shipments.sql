@@ -47,7 +47,7 @@ select decode(oel.ship_from_org_id,90,'BMX',85,'BIM',oel.ship_from_org_id) "Ship
     )
     ,trunc(oel.promise_date)),trunc(oel.request_date)),decode(oel.invoice_to_org_id,222359,2,281854,2,222413,2,0)) "First Promise date"
 , to_char(oel.actual_shipment_date, 'MM/DD/YYYY') "Ship Date"
-, round(oel.promise_date - oel.actual_shipment_date,0) "Days Early"
+, round(trunc(oel.promise_date) - trunc(oel.actual_shipment_date),0) "Days Early"
 , hp_bill.party_name "Bill To"
 , hp_ship.party_name "Ship To"
 , oel.attribute20 "Blanket"
@@ -117,7 +117,7 @@ group by oeh.order_number
 , to_char(oel.request_date, 'MM/DD/YYYY')
 , to_char(oel.promise_date, 'MM/DD/YYYY')
 , to_char(oel.actual_shipment_date, 'MM/DD/YYYY')
-, round(oel.promise_date - oel.actual_shipment_date,0)
+, round(trunc(oel.promise_date) - trunc(oel.actual_shipment_date),0)
 , hp_bill.party_name
 , hp_ship.party_name, oel.attribute20
 ,m.planner_code
