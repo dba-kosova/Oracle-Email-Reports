@@ -309,7 +309,6 @@ where
     and ola.source_type_code <> 'EXTERNAL'
     and ola.line_type_id not in (
         1073,
-        1077,
         1127
     ) -- return, sample, vendor order
         and ola.header_id       = prc.header_id

@@ -241,6 +241,6 @@ and ola.ship_to_org_id = b.site_use_id -- or a.invoice_to_org_id
 	and b2.cust_acct_site_id = c2.cust_acct_site_id
     and ola.order_source_id <> 10 -- internal orders
     and ola.source_type_code <> 'EXTERNAL'
-    and ola.line_type_id not in (1073,1077,1127) -- return, sample, vendor order
+    and ola.line_type_id not in (1073,1127) -- return, sample, vendor order
     
 order by trunc(schedule_ship_date) asc
