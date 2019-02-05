@@ -58,8 +58,7 @@ select decode(oel.ship_from_org_id,90,'BMX',85,'BIM',oel.ship_from_org_id) "Ship
         else 'mto'
     end "Shelving"
     , nvl(category_concat_segs,'Special') "Category"
-    
-    
+    , nvl(min(mmt.subinventory_code),'No') "Line Pick"
 from oe_order_lines_all oel
 , oe_order_headers_all oeh
 , hz_cust_site_uses_all hcs_ship
@@ -74,7 +73,7 @@ from oe_order_lines_all oel
 ,wsh_carrier_ship_methods wc
 , mtl_system_items_b m
 , mtl_item_categories_v mic
-
+,  mtl_material_transactions mmt
 where oel.open_flag                  = 'N'
 	and oel.org_id                      = 83
 	and oel.order_source_id            <> 10
@@ -103,6 +102,10 @@ where oel.open_flag                  = 'N'
         and oel.inventory_item_id                   = mic.inventory_item_id(+)
     and oel.ship_from_org_id                    = mic.organization_id(+)
     and mic.structure_id(+)                   = '50415'
+    and wsh.organization_id = mmt.organization_id(+)
+    and mmt.transaction_type_id(+) = 52
+     and wsh.transaction_Id = mmt.transaction_Id(+)
+     and mmt.subinventory_code(+) = 'LINEPICK'
 group by oeh.order_number
 , oel.line_number
 , oel.shipment_number

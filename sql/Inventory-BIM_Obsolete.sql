@@ -18,9 +18,10 @@ select msi.segment1 "Item"
 , date_received "Date Recieved"
 , item_cost "Cost"
 , nvl (on_hand_qty * nvl (item_cost, 0), 0) "Total Cost"
-, nvl(v_trx_qty,0) "Transaction Qty (11mo)"
+, nvl(trx.v_trx_qty,0) "Transaction Qty (12mo)"
+, nvl(trx_2.v_trx_qty,0) "Transaction Qty (6mo)"
 --, round(months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12*36)),1) months
-, decode(nvl(v_trx_qty,0),0,0,round (abs (trx.v_trx_qty)           / round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12)), 1), 2)) "Act Usage"
+, decode(nvl(trx.v_trx_qty,0),0,0,round (abs (trx.v_trx_qty)           / round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12)), 1), 2)) "Act Usage"
 , (nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)) "Mfg Usage"
 , nvl((
 		select safety_stock_quantity
@@ -42,7 +43,7 @@ select msi.segment1 "Item"
 			when round (abs (trx.v_trx_qty) / round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12)), 1), 2) != 0
 			and on_hand_qty      > 0
 			then on_hand_qty                / round (abs (trx.v_trx_qty) / round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12)), 1), 2)
-			when nvl(v_trx_qty,0) = 0
+			when nvl(trx.v_trx_qty,0) = 0
 				and on_hand_qty      > 0
 			then 9999
 			else 0
@@ -64,16 +65,29 @@ from mtl_system_items_b msi
 	moqd
 , (
 		select sum (abs (mmt.transaction_quantity)) v_trx_qty
-		, round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-11)), 1) v_months
+		, round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12)), 1) v_months
 		, inventory_item_id
 		
 		from mtl_material_transactions mmt
 		where mmt.transaction_type_id                                                                  in (35, 33) -- SO issue and WIP issue
-			and trunc (mmt.transaction_date) between add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-11) and apps.xxbim_get_calendar_date('BIM',sysdate,-1)
+			and trunc (mmt.transaction_date) between add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-12) and apps.xxbim_get_calendar_date('BIM',sysdate,-1)
 		group by 
 		 inventory_item_id
 	)
 	trx
+
+, (
+		select sum (abs (mmt.transaction_quantity)) v_trx_qty
+		, round (months_between (apps.xxbim_get_calendar_date('BIM',sysdate,-1), add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-6)), 1) v_months
+		, inventory_item_id
+		
+		from mtl_material_transactions mmt
+		where mmt.transaction_type_id                                                                  in (35, 33) -- SO issue and WIP issue
+			and trunc (mmt.transaction_date) between add_months(apps.xxbim_get_calendar_date('BIM',sysdate,-1),-6) and apps.xxbim_get_calendar_date('BIM',sysdate,-1)
+		group by 
+		 inventory_item_id
+	)
+	trx_2
 , mtl_item_categories_v cat
 , mtl_item_categories_v ss_cat
 , mtl_item_categories_v obs_cat
