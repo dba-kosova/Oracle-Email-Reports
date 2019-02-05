@@ -58,8 +58,8 @@ where
     and wip_supply.lookup_type = 'WIP_SUPPLY'
     ), scheduled_start_date),null) "Planned Start Date"
     ,wdj.date_released         "Released",
-    ola.creation_date         "Created",
-    trunc(ola.request_date) "Request",
+ least(ola.creation_date,line_date) "Created"
+, trunc(ola.request_date) "Request",
     trunc(ola.schedule_ship_date) "Schedule Ship",
     trunc(ola.promise_date) "Promise",
     nvl((
@@ -133,40 +133,10 @@ where
         where
             wcsm.ship_method_code = ola.shipping_method_code
             and wcsm.organization_id = ola.ship_from_org_id
-    ) "Ship Method",
-    round(nvl((
-        select
-            ola2.unit_selling_price
-        from
-            oe_order_lines_all ola2, oe_order_headers_all oha2
-        where
-            ola.header_id = oha.header_id
-            and ola.header_id = ola2.header_id
-            and ola2.header_id = oha2.header_id
-            and oha.order_number = oha2.order_number
-            and ola.line_number = ola2.line_number
-            and ola2.unit_selling_price is not null
-            and ola2.unit_selling_price <> '0'
-            and ola.shipment_number = ola2.shipment_number
-            and rownum = 1
-    ), 0), 2) "Unit Price",
-    round(nvl((
-        select
-            ola2.unit_selling_price
-        from
-            oe_order_lines_all ola2, oe_order_headers_all oha2
-        where
-            ola.header_id = oha.header_id
-            and ola.header_id = ola2.header_id
-            and ola2.header_id = oha2.header_id
-            and oha.order_number = oha2.order_number
-            and ola.line_number = ola2.line_number
-            and ola2.unit_selling_price is not null
-            and ola2.unit_selling_price <> '0'
-            and ola.shipment_number = ola2.shipment_number
-            and rownum = 1
-    ), 0), 2) * nvl(reservation_quantity, ordered_quantity) "Total Price",
-    decode(e.country, 'US', 'DOM', 'CA', 'INT', 'MX', 'INT', null, 'DOM', 'INT') "DOM/INT",
+    ) "Ship Method"
+        , round(prc.net_price,2) "Unit Price"
+    , round(prc.net_price  * nvl(reservation_quantity,ordered_quantity), 2)  "Total Price"
+,    decode(e.country, 'US', 'DOM', 'CA', 'INT', 'MX', 'INT', null, 'DOM', 'INT') "DOM/INT",
     e.party_name              "Customer",
     e2.party_name             "Distributor",
     (
@@ -292,6 +262,19 @@ from
     hz_parties e2,
     hz_cust_acct_sites_all c2,
     hz_cust_site_uses_all b2
+    , (
+        select header_id
+        , line_number
+        , shipment_number
+        , min(creation_date) line_date
+        , sum(unit_list_price ) list_price
+        , sum(unit_selling_price) net_price
+        from oe_order_lines_all
+        group by header_id
+        , line_number
+        , shipment_number
+    )
+    prc
 where
     ola.header_id = oha.header_id
     and ola.project_id = pjm.project_id
@@ -329,5 +312,9 @@ where
         1077,
         1127
     ) -- return, sample, vendor order
+        and ola.header_id       = prc.header_id
+    and ola.line_number     = prc.line_number
+    and ola.shipment_number = prc.shipment_number
+
 order by
     trunc(schedule_ship_date) asc
