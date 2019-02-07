@@ -48,7 +48,7 @@ select msi.segment1 "Item"
 			then 9999
 			else 0
 		end,1) "Act MOH"
-, decode((nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)),0,9999,round(on_hand_qty / (nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)),1)) "Mfg MOH"
+, decode((nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 85 and inventory_item_id = msi.inventory_item_id),0)),0,9999,round(on_hand_qty / (nvl(msi.attribute7,0) + nvl((select attribute7 from mtl_system_items_b where organization_id = 90 and inventory_item_id = msi.inventory_item_id),0)),1)) "Mfg MOH"
 , to_char(msi.creation_date, 'MM/DD/YY') "Creation Date"
 from mtl_system_items_b msi
 , cst_item_costs cic
@@ -124,6 +124,7 @@ where msi.inventory_item_id    = moqd.inventory_item_id
 	and msi.inventory_item_id     = cic.inventory_item_id(+)
 	and msi.organization_id       = cic.organization_id(+)
 	and msi.inventory_item_id     = trx.inventory_item_id(+)
+	and msi.inventory_item_id     = trx_2.inventory_item_id(+)
 --	and msi.organization_id       = trx.organization_id(+)
 	and cic.cost_type_id(+)       = 1
 	and msi.organization_id       = 85
