@@ -11,39 +11,39 @@ decode(ola.ship_from_org_id,85,'BIM',90,'BMX') "Org"
 , wdj.quantity_remaining "Open Qty"
 , xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'ATR') "Qty ATR"
 , xxbim_get_quantity(msi.inventory_item_id, msi.organization_id, 'TQ') "Qty TQ"
-, decode(decode(wdj.status_type_disp,'Released','1','Unreleased','1','On Hold','1','0'),'1', nvl((select
-    max((
-        select
-            min(old_schedule_date)
-        from
-            msc_supplies ord, msc.msc_system_items msc
-        where
-            ord.organization_id = 85
-            and order_type in(
-                1, 2, 3
-            ) --1:po, 2:purchase req, 3:wo, 4:null, 5:plannedOrder
-            and item_name = msi2.segment1
-            and ord.plan_id = msc.plan_id
-            and msc.plan_id = 21
-            and ord.organization_id = msc.organization_id
-            and ord.inventory_item_id = msc.inventory_item_id
-            --and old_schedule_date > apps.xxbim_get_calendar_date('BIM', sysdate, - 5)
-    )) supply_date
-from
-    wip_requirement_operations wro,
-    mtl_system_items_b msi2,
-    mfg_lookups wip_supply
-where
-    1 = 1
-    and wro.wip_entity_id = wdj.wip_entity_id
-    and wro.organization_id = wdj.organization_id
-    and wro.inventory_item_id = msi2.inventory_item_id
-    and wro.organization_id = msi2.organization_id
-    and wro.attribute2 is not null
-    and wro.attribute2 not like '0%'
-    and wro.wip_supply_type = wip_supply.lookup_code
-    and wip_supply.lookup_type = 'WIP_SUPPLY'
-    ), scheduled_start_date),null) "Planned Start Date"
+, case when wdj.status_type = 3 /* released */ then trunc(date_released)
+       else greatest(nvl((select
+                        -- get greatest of all shortages
+                        max((
+                            select
+                                trunc(min(old_schedule_date))
+                            from
+                                msc_supplies ord, msc.msc_system_items msc
+                            where
+                                ord.organization_id = 85
+                                and order_type in(
+                                    1, 2, 3
+                                ) --1:po, 2:purchase req, 3:wo, 4:null, 5:plannedOrder
+                                and item_name = wro.segment1
+                                and ord.plan_id = msc.plan_id
+                                and msc.plan_id = 21
+                                and ord.organization_id = msc.organization_id
+                                and ord.inventory_item_id = msc.inventory_item_id
+                                -- don't want way past due supply
+                                -- and old_schedule_date > apps.xxbim_get_calendar_date('BIM', sysdate, - 5)
+                        )) supply_date
+                    from
+                        wip_requirement_operations wro
+                        , wip_discrete_jobs wd
+                    where
+                        1 = 1
+                       -- and wro.wip_entity_id = 15696803
+                        and wro.organization_id = 85
+                        and wro.attribute2 is not null
+                        and wro.attribute2 not like '0%'
+                        and wro.wip_entity_id = wd.wip_entity_id
+                        and wd.project_id = wdj.project_id
+                ), trunc(scheduled_start_date)),trunc(sysdate, 'D')) end "Planned Start Date"
 , wdj.date_released "Released"
 , least(ola.creation_date,line_date) "Created"
 , trunc(ola.request_date) "Request"
