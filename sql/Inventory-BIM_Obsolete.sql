@@ -2,7 +2,7 @@ select
     msi.segment1     "Item",
     description      "Description",
     msi.attribute7   "Monthly Usage (12 mo)",
-    decode((
+    decode(nvl((
         select
             item_name
         from
@@ -10,16 +10,14 @@ select
         where
             md.plan_id = msc.plan_id
             and md.inventory_item_id = msc.inventory_item_id
-            and md.organization_id in(
-                85
-            )
+            and md.organization_id = 85
             and md.organization_id = msc.organization_id
             and md.plan_id = 21
             and msc.sr_inventory_item_id = msi.inventory_item_id
         group by
             item_name
-    ), 'null', 'No', 'Yes') "BIM Demands",
-    decode((
+    ),'No'),'No','No','Yes') "BIM Demands",
+    decode(nvl((
         select
             item_name
         from
@@ -27,33 +25,18 @@ select
         where
             md.plan_id = msc.plan_id
             and md.inventory_item_id = msc.inventory_item_id
-            and md.organization_id in(
-                90
-            )
+            and md.organization_id = 90
             and md.organization_id = msc.organization_id
             and md.plan_id = 21
             and msc.sr_inventory_item_id = msi.inventory_item_id
         group by
             item_name
-    ), 'null', 'No', 'Yes') "BMX Demands",
-    
-    nvl((select category_concat_segs from 
-        mtl_item_categories_v obs_cat
-        where msi.organization_id = obs_cat.organization_id 
-    and obs_cat.category_set_id (+) = '1100000161'
-    and msi.inventory_item_id = obs_cat.inventory_item_id 
-  and category_id = 7518), 'No')  "Obs Exception",
-    
-    
+    ),'No'),'No','No','Yes') "BMX Demands",
+
+    nvl(obs_cat.category_concat_segs, 'No')  "Obs Exception",  
     item_type        "Item Type",
     planner_code     "Planner",
-        
-    nvl((select category_concat_segs from mtl_item_categories_v cat
-     where msi.organization_id = cat.organization_id
-    and cat.category_set_id  = '1100000101'
-    and category_id = 7493
-    and msi.inventory_item_id = cat.inventory_item_id),'Special') "Std/Spc"
-    
+    nvl(cat.category_concat_segs,'Special') "Std/Spc"
     ,on_hand_qty      "On Hand",
     (
         select
@@ -160,24 +143,30 @@ from
         group by
             inventory_item_id,
             organization_id
-    ) moqd
+    ) moqd,
+    mtl_item_categories_v obs_cat,
+    mtl_item_categories_v cat
 where
     msi.inventory_item_id = moqd.inventory_item_id
     and msi.organization_id = moqd.organization_id
     and msi.inventory_item_id = cic.inventory_item_id (+)
     and msi.organization_id = cic.organization_id (+)
-    --and msi.planner_code = 'NJIT'
     and cic.cost_type_id (+) = 1
     and msi.organization_id = 85
-    and item_type not in (
-        'TOOL'
-    )
+    and item_type <> 'TOOL'
     and planner_code not in (
         'TOL',
         'TPK'
     )
-  
-
-    --and msi.segment1           = '011-DPNEE0.7'
     
+    and msi.organization_id = obs_cat.organization_id(+) 
+    and obs_cat.category_set_id (+) = '1100000161'
+    and msi.inventory_item_id = obs_cat.inventory_item_id(+) 
+    and obs_cat.category_id(+) = 7518
     
+    and msi.organization_id = cat.organization_id(+)
+    and cat.category_set_id(+)  = '1100000101'
+    and cat.category_id(+) = 7493
+    and msi.inventory_item_id = cat.inventory_item_id(+)
+    
+   -- and msi.segment1           = 'OLE-753.5-12-E2FTT2T4*005974'
