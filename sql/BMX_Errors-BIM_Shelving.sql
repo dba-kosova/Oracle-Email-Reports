@@ -45,21 +45,21 @@ where
     and msi.wip_supply_type = fl5.lookup_code(+) 
 
     and (inventory_item_status_code <> 'Active'
-    or fixed_days_supply <> 60
-    or receiving_routing_id <> 3
-    or acceptable_early_days <> 10
-    or planning_time_fence_code <> 4
-    or full_lead_time > 5
-    or end_assembly_pegging_flag <> 'B'
-    or replenish_to_order_flag <> 'Y'
-    or atp_components_flag <> 'Y'
-    or wip_supply_type <> 1
-    or cycle_count_enabled_flag <> 'Y'
-    or mrp_planning_code <> 7
-    or release_time_fence_code <> 4
-    or release_time_fence_days <> 20
-    or sourcing_rule_name <> 'BIM Transfer from BMX'
+    or nvl(fixed_days_supply,0) <> 60
+    or nvl(receiving_routing_id,0) <> 3
+    or nvl(acceptable_early_days,0) <> 10
+    or nvl(planning_time_fence_code,0) <> 4
+    or nvl(full_lead_time,0) > 5
+    or nvl(end_assembly_pegging_flag,'asdf') <> 'B'
+    or nvl(replenish_to_order_flag,'N') <> 'Y'
+    or nvl(atp_components_flag,'N') <> 'Y'
+    or nvl(wip_supply_type,0) <> 1
+    or nvl(cycle_count_enabled_flag,'N') <> 'Y'
+    or nvl(mrp_planning_code,0) <> 7
+    or nvl(release_time_fence_code,0) <> 4
+    or nvl(release_time_fence_days,0) <> 20
+    or nvl(sourcing_rule_name,'asdf') <> 'BIM Transfer from BMX'
     or not exists (select subinventory_code from mtl_item_sub_defaults where inventory_item_id = msi.inventory_item_id and organization_id = msi.organization_id)
-    or minimum_order_quantity <> greatest(round(msi.attribute7/10,0) * 10,25)
+    or nvl(minimum_order_quantity,0) <> greatest(round(msi.attribute7/10,0) * 10,25)
     )
   
