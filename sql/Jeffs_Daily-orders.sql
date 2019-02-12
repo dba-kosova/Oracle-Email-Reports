@@ -75,6 +75,8 @@ where ola.ship_to_org_id = b.site_use_id -- or a.invoice_to_org_id
 	and b.cust_acct_site_id = c.cust_acct_site_id
     and line_id = mr.demand_source_line_id) "Customer"
     , substr(msi.segment1, 0,instr(msi.segment1,'-')-1) "Prefix"
+     ,(select meaning from OE_LOOKUPS where ola.shipment_priority_code = lookup_code and lookup_type = 'SHIPMENT_PRIORITY') "Priority"
+
 from wip_discrete_jobs_v wdj
 , mtl_system_items_b msi
 , mtl_reservations mr
