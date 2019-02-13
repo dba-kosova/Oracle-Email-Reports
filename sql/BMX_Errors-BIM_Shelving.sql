@@ -1,5 +1,5 @@
 select
-    segment1 "Part Number",
+    msi.segment1 "Part Number",
     planner_code "Planner Code",
     inventory_item_status_code "Item Status - Active",
     fixed_days_supply "Fixed Days Supply - 60",
@@ -18,7 +18,20 @@ select
     fl3.meaning "MRP Planning - MRP/MPP Planned" ,
     fl2.meaning "Release Time Fence - User Def",
     release_time_fence_days "Release Days - 20",
-    sourcing_rule_name "Sourcing Rule - BIM Tr"
+    sourcing_rule_name "Sourcing Rule - BIM Tr",
+    category_concat_segs "Forecast Cat - BIMFCST.SHEL",
+    (
+    select safety_stock_quantity from (
+    select inventory_item_id , effectivity_date
+    ,      safety_stock_quantity
+    from MTL_SAFETY_STOCKS 
+    where organization_id = 85
+    order by effectivity_date desc)
+    where rownum = 1
+    and inventory_item_id =msi.inventory_item_id) "Safety Stock",
+    greatest(round(msi.attribute7*3/10,0) * 10,25) "Correct Safety Stock",
+    rule_name "ATP Rule - Bimba SFG Trans"
+   
 from
     mtl_system_items_b msi,
     fnd_lookup_values_vl fl,
@@ -26,7 +39,9 @@ from
     fnd_lookup_values_vl fl3,
     fnd_lookup_values_vl fl4,
     fnd_lookup_values_vl fl5,
-    mrp_sr_assignments_v sourcing
+    mrp_sr_assignments_v sourcing,
+    mtl_item_categories_v cat,
+    MTL_ATP_RULES mar
 where
     msi.organization_id = 85
     and planner_code like '%SHV-M'
@@ -43,7 +58,13 @@ where
     and msi.end_assembly_pegging_flag = fl4.lookup_code(+) 
     and fl5.lookup_type(+) = 'WIP_SUPPLY'
     and msi.wip_supply_type = fl5.lookup_code(+) 
-
+    
+    and msi.organization_id = cat.organization_id(+) 
+    and cat.category_set_id (+) = '1100000062'
+    and msi.inventory_item_id = cat.inventory_item_id(+) 
+    and cat.category_id(+) = 6236
+    
+    and msi.ATP_RULE_ID = mar.rule_id(+)
     and (inventory_item_status_code <> 'Active'
     or nvl(fixed_days_supply,0) <> 60
     or nvl(receiving_routing_id,0) <> 3
@@ -61,5 +82,15 @@ where
     or nvl(sourcing_rule_name,'asdf') <> 'BIM Transfer from BMX'
     or not exists (select subinventory_code from mtl_item_sub_defaults where inventory_item_id = msi.inventory_item_id and organization_id = msi.organization_id)
     or nvl(minimum_order_quantity,0) <> greatest(round(msi.attribute7/10,0) * 10,25)
+    or nvl(atp_rule_id,1234) <> 26180463
+    or  (
+    select safety_stock_quantity from (
+    select inventory_item_id , effectivity_date
+    ,      safety_stock_quantity
+    from MTL_SAFETY_STOCKS 
+    where organization_id = 85
+    order by effectivity_date desc)
+    where rownum = 1
+    and inventory_item_id =msi.inventory_item_id) <> greatest(round(msi.attribute7*3/10,0) * 10,25)
+    or nvl(category_concat_segs,'asfd') <> 'BIMFCST.SHEL'
     )
-  
