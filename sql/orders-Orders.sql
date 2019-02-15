@@ -1,5 +1,4 @@
-select distinct ola.line_id,
-decode(ola.ship_from_org_id,85,'BIM',90,'BMX') "Org"
+select distinct decode(ola.ship_from_org_id,85,'BIM',90,'BMX') "Org"
 , wdj.wip_entity_name "Job"
 , pjm.project_number "Project"
 , (select attribute1 from bom_operational_routings b where alternate_routing_designator is null and b.organization_id = ola.ship_from_org_id and assembly_item_id = ola.inventory_item_id) "Line"

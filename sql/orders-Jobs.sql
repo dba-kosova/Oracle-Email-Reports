@@ -1,8 +1,9 @@
-select decode(msi.organization_id, 85, 'BIM', 90, 'BMX') "Org", wdj.wip_entity_id
+select decode(msi.organization_id, 85, 'BIM', 90, 'BMX') "Org"
 , project_name "Project"
 , wip_entity_name "Job"
 , msi.segment1 "Item"
 , substr(msi.description,0,20) "Description"
+, msi.planner_code "Planner"
 , status_type_disp "Status"
 , wdj.attribute1
     ||'.'
