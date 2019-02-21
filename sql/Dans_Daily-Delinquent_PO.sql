@@ -36,6 +36,7 @@ WHERE
     ord.organization_code = 'BIM:BIM'
     AND ord.compile_designator = 'BIM'
     AND ord.order_type = 1
+    and ord.order_type_text = 'Purchase order'
  -- AND ord.item_segments = 'D-6668-P'
     AND category_id IN (
         SELECT
