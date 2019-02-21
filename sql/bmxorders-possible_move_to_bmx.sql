@@ -39,7 +39,7 @@ where wdj.organization_id     = 85
     and wdj.wip_entity_id         = mr.supply_source_header_id(+)
     and (wdj.attribute2 <> 0
         or wdj.attribute3 <> 0)
-    and line_code in ( 'OL', 'OL-B')
+    and line_code in ( 'OL', 'OL-B','OL-SHV', 'ACC', 'ACC-SHV')
     and demand_source_header_id is not null
     and wdj.project_id is not null
     and not exists (select
