@@ -55,6 +55,7 @@ WHERE
     AND   wdj.attribute3 = 0
     AND   wdj.status_type_disp = 'On Hold'
     and nvl(wdj.attribute9,'asdf') <> 'QA JIT Hold'
+    and xxbim_get_quantity(exception_item.inventory_item_id,exception_item.organization_id,'ATR') > 0
 
     --AND   xxbim_get_quantity(exception_item.inventory_item_id,exception_item.organization_id,'ATR') > 0
 ORDER BY
