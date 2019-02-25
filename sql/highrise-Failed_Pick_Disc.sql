@@ -11,7 +11,7 @@ from wip_discrete_jobs_v we
 where we.organization_id  = 85
 	and msip.organization_id = we.organization_id
 	and wro.organization_id  = we.organization_id
-	and date_released > trunc(sysdate)
+	and date_released > apps.xxbim_get_calendar_date('BIM',sysdate, -1)
 	and (we.line_code like 'SUB%'
 	or we.line_code = 'OLE'
 	or we.line_code = 'CSS'
