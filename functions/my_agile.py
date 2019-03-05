@@ -20,7 +20,7 @@ def er_status(item):
         if login(s) == "no agile": return "no agile" 
 
         search_page_props = search_page(s.get(AGILE_PROD_URL + '?&ajaxRequest=true&forwardToPage=true&module=QuickSearchHandler&opcode=executeQuickSearch&quickSearchSelectionObject=931&baseClassId=931&ThumbnailSearchViewMode=&QUICKSEARCH_STRING=' + part_number + '/&needAttachmentSearch=false&isLastSearchSingleObject=false&persistLastSearch=false&parentClassId=931&containerWidth=1239&objid=-1&classid=901&rnd=1508440113500'))
-        print(search_page_props.status())
+        
         return search_page_props.status()
 
 
