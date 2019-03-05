@@ -115,6 +115,51 @@ class Workbook:
         self.close()   
         return str(self.my_excel_path)
 
+    def create_worksheet_from_data(self,header,data):
+
+       
+        # create worksheet formats
+        headerFormat = self.workbook.add_format()
+        headerFormat.set_bold()
+        headerFormat.set_align('center')
+        bodyFormat = self.workbook.add_format()
+        bodyFormat.set_align('left')  
+        dateFormat = self.workbook.add_format({'num_format': 'd-mmm-yy', 'align':'left'})
+
+
+        sheet = self.workbook.add_worksheet(str('Data'))
+        sheet.freeze_panes(1,0)
+        sheet.set_column(0,len(header),18)
+
+        i=0
+        col = 0
+        for i in header:
+            sheet.write(0, col, i, headerFormat)
+            col += 1       
+        row = 1
+        col = 0
+        
+        i=0
+        n=0
+        row=1
+        col = 0
+        for i in data:
+            for n in range(len(header)):
+                try:
+                    sheet.write_number(row, col + n , float(i[n]), bodyFormat)
+                except:
+                    try:
+                        sheet.write_datetime(row, col + n , i[n], dateFormat)
+                    except:
+                        sheet.write_string(row, col + n , str(i[n]), bodyFormat)
+            row += 1  
+
+        # don't show emtpy sheets
+        if row <= 1: sheet.hide()
+
+        self.close()   
+        return str(self.my_excel_path)
+
     def create_print_worksheets(self):
 
         # connect to database

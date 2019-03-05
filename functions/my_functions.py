@@ -1,5 +1,7 @@
 from shutil import copyfile
 from pathlib import Path
+import sys
+from .my_database import Database
 
 def make_sql_file(source, filename, sql):
 
@@ -23,3 +25,19 @@ def make_sql_file(source, filename, sql):
     f = open(new_file, "w")
     f.write(contents)
     f.close()
+
+
+
+def run_sql_statement(sql_statment):
+    report_name = Path(sys.argv[0]).stem
+    me = Database()
+    
+    # connect to oracle database
+    me.oracle_connect()
+    
+    data = me.run_url('sql/'+report_name.lower() + '-' + sql_statment + '.sql').fetchall()
+
+    # close connection and cursor
+    me.close()
+
+    return data
