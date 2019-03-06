@@ -34,7 +34,7 @@ def main(reportName):
             'Ordered Date',
             'Request Date',
             'Agile ER Number',
-            'ER Status']
+            'ER Status', 'ER Close Date']
 
     me.create_worksheet_from_data(header, new_data)
     
