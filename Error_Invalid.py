@@ -12,10 +12,9 @@ def main(reportName):
         this = [q for q in x]
         if x[-1] != 'NONE':
             this.extend([g for g in er_status(x[-1])])
-            print(this)
             new_data.append(this)
         else:
-            this.append('None')
+            this.extend(['None',''])
             new_data.append(this)
 
 

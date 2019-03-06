@@ -117,7 +117,7 @@ class Workbook:
 
     def create_worksheet_from_data(self,header,data):
 
-       
+
         # create worksheet formats
         headerFormat = self.workbook.add_format()
         headerFormat.set_bold()
